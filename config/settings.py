@@ -269,13 +269,13 @@ LOGGING = {
     "loggers": {
         "django.request": {
             "handlers": ["console"],
-            "level": "DEBUG",
-            "propagate": False,
+            "level": "ERROR",
+            "propagate": True,
         },
         "django.security": {
             "handlers": ["console"],
-            "level": "DEBUG",
-            "propagate": False,
+            "level": "ERROR",
+            "propagate": True,
         },
     },
     "root": {"level": "INFO", "handlers": ["console"]},
