@@ -32,6 +32,10 @@ DEBUG = config("DEBUG", default=True, cast=bool)
 _allowed_hosts_env = config("ALLOWED_HOSTS", default="127.0.0.1,localhost")
 ALLOWED_HOSTS = [h.strip() for h in _allowed_hosts_env.split(",") if h.strip()]
 
+# Reverse proxy settings (Traefik / Nginx)
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
 # change the default user models to our custom model
 AUTH_USER_MODEL = "accounts.User"
 
