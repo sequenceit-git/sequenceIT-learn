@@ -1,10 +1,6 @@
-version: "3.9"
-
-# ============================================================
 # SequenceIT Learn — Production Docker Compose Stack
-# Routing: Traefik (already running on host) → sms-demo.sequenceit.com
+# Routing: Traefik (running in host mode) → sms-demo.sequenceit.com
 # Services: web (Django/Gunicorn) | db (PostgreSQL)
-# ============================================================
 
 services:
 
@@ -27,12 +23,11 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - sequenceit_network   # internal only — DB never exposed to Traefik
+      - sequenceit_network
 
   # ----------------------------------------------------------
   # Django Application (Gunicorn)
-  # Traefik picks this up via labels and routes
-  # sms-demo.sequenceit.com → this container on port 8000
+  # Traefik picks this up via labels
   # ----------------------------------------------------------
   web:
     image: ${DOCKER_IMAGE:-sequenceit-web}:latest
@@ -59,14 +54,12 @@ services:
       db:
         condition: service_healthy
     networks:
-      - sequenceit_network   # internal network (talks to db)
-      - traefik            # Traefik's external network (for routing)
-    expose:
-      - "8000"
+      - sequenceit_network
+    ports:
+      - "8000:8000"
     labels:
       # ---- Enable Traefik for this container ----
       - "traefik.enable=true"
-      - "traefik.docker.network=traefik"
 
       # ---- HTTPS Router (primary) ----
       - "traefik.http.routers.sequenceit.rule=Host(`sms-demo.sequenceit.com`)"
@@ -104,7 +97,4 @@ volumes:
 # ============================================================
 networks:
   sequenceit_network:
-    driver: bridge          # internal DB ↔ app communication
-
-  traefik:
-    external: true          # must already exist on the host (created by your Traefik setup)
+    driver: bridge
