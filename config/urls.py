@@ -5,8 +5,8 @@ from django.conf.urls.static import static
 from django.views import defaults as default_views
 from django.conf.urls.i18n import i18n_patterns
 from django.views.i18n import JavaScriptCatalog
-
 from django.http import JsonResponse
+from django.views.generic import RedirectView
 
 def temporary_seed_db(request):
     if not request.user.is_superuser:
@@ -236,9 +236,13 @@ def temporary_seed_db(request):
 admin.site.site_header = "Learn With SequenceIT Admin"
 
 urlpatterns = [
+    path("", RedirectView.as_view(url="/en/", permanent=False)),  # root redirect to default locale
     path("admin/", admin.site.urls),
     path("i18n/", include("django.conf.urls.i18n")),
     path("seed-db/", temporary_seed_db),
+    # Fallback: non-i18n /accounts/login/ redirect to /en/accounts/login/
+    path("accounts/login/", RedirectView.as_view(url="/en/accounts/login/", permanent=False)),
+    path("accounts/", RedirectView.as_view(url="/en/accounts/login/", permanent=False)),
 ]
 
 urlpatterns += i18n_patterns(
