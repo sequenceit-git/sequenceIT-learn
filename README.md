@@ -1,97 +1,265 @@
-![Group 23](https://github.com/user-attachments/assets/4e84251a-27b0-462b-bd5e-fb0bcadc4694)
+# SequenceIT Learn
 
-### The world’s most high-end designed, lightweight, and feature-rich learning management system.
+> **A modern, open-source Learning Management System** built with Django — designed for schools, colleges, and organizations who want full control over their e-learning platform.
 
-# SkyLearn: Open source learning management system
+[![Django CI/CD](https://github.com/sequenceit-git/sequenceIT-learn/actions/workflows/django.yml/badge.svg)](https://github.com/sequenceit-git/sequenceIT-learn/actions/workflows/django.yml)
+[![Python 3.11](https://img.shields.io/badge/Python-3.11-blue?logo=python)](https://www.python.org/)
+[![Django 4.0](https://img.shields.io/badge/Django-4.0-green?logo=django)](https://www.djangoproject.com/)
+[![Docker](https://img.shields.io/badge/Docker-ready-2496ED?logo=docker)](https://www.docker.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-Learning management system using Django web framework. You might want to develop a learning management system (also known as a school/college management system) for a school/college organization, or simply for the purpose of learning the tech stack and enhancing your portfolio. In either case, this project would be a great way to get started. The aim is to create the world's most lightweight yet feature-rich learning management system. However, this is not possible without your support, so please give it a star ⭐️.
+---
 
-_Documentation is under development_
+## ✨ Features
 
-Let's enhance the project by contributing! 👩‍💻👩‍💻
+### 👥 User Management
+- Role-based access: **Admin**, **Lecturer**, and **Student**
+- Admin manages students and lecturers (Add, Update, Delete)
+- Custom user profiles with avatar support
+- Secure login, logout, and password reset
 
-<img width="1440" alt="screenshot" src="https://github.com/user-attachments/assets/08644f49-6ae0-4695-86cc-afe331c6f61a">
-
-## Current features
-
-- Dashboard: School demographics and analytics. Restricted to only admins
-- News And Events: All users can access this page
-- Admin manages students(Add, Update, Delete)
-- Admin manages lecturers(Add, Update, Delete)
-- Students can Add and Drop courses
-- Lecturers submit students' scores: _Attendance, Mid exam, Final exam, assignment_
-- The system calculates students' _Total, average, point, and grades automatically_
-- Grade comment for each student with a **pass**, **fail**, or **pass with a warning**
-- Assessment result page for students
-- Grade result page for students
+### 📚 Academic Management
 - Session/year and semester management
-- Assessments and grades will be grouped by semester
-- Upload video and documentation for each course
-- PDF generator for students' registration slip and grade result
-- Page access restriction
-- Storing of quiz results under each user
+- Program & course management with allocation
+- Students can add and drop courses
+- Lecturers submit scores: *Attendance, Mid Exam, Final Exam, Assignment*
+- System auto-calculates: *Total, Average, GPA, and Grade*
+- Grade comment: **Pass**, **Fail**, or **Pass with Warning**
+- Assessment and grade result pages for students
+- PDF generation for registration slips and grade results
+
+### 🧠 Quiz & Assessment
+- Multiple choice, True/False question types
+- Essay type *(Coming soon)*
 - Question order randomization
-- Previous quiz scores can be viewed on the category page
-- Correct answers can be shown after each question or all at once at the end
-- Logged-in users can return to an incomplete quiz to finish it and non-logged-in users can complete a quiz if their session persists
-- The quiz can be limited to one attempt per user
-- Questions can be given a category
-- Success rate for each category can be monitored on a progress page
-- Explanation for each question result can be given
-- Pass marks can be set
-- Multiple choice question type
-- True/False question type
-- Essay question type................._Coming soon_
-- Custom message displayed for those that pass or fail a quiz
-- Custom permission (view_sittings) added, allowing users with that permission to view quiz results from users
-- A marking page which lists completed quizzes, can be filtered by quiz or user, and is used to mark essay questions
+- One attempt limit per user (optional)
+- Questions grouped by category
+- Pass mark configuration
+- Detailed per-question explanations
+- Progress tracking per category
+- Quiz marking page for lecturers (can be filtered by quiz or user)
+- Logged-in users can resume incomplete quizzes
 
-# Quick note for future contributors
+### 📊 Dashboard & Analytics
+- Admin-only school demographics dashboard
+- News & Events for all users
+- Search across courses, programs, quizzes, and events
 
-If you would like to contribute, simply begin by implementing one from the list in the `TODO.md` file.
+### 🌍 Internationalization
+- Multi-language support: **English, French, Spanish, Russian**
+- Language switcher built into the UI
 
-# Requirements:
+### 💳 Payments
+- Stripe integration for course payments
+- GoPay support
 
-> The following program(s) are required to run the project
+### 🎨 UI / UX
+- Premium dark-mode-ready UI with glassmorphism effects
+- Responsive sidebar with animated **"S"** brand icon
+- Smooth SPA-style page transitions (no full reload)
+- Built with Bootstrap 5, Lucide Icons, and Outfit font
 
-- [Python3.8+](https://www.python.org/downloads/)
+---
 
-# Installation
+## 🚀 Deployment
 
-- Clone the repo with
+SequenceIT Learn is production-ready with a full Docker + CI/CD setup.
 
-```bash
-git clone https://github.com/SkyCascade/SkyLearn.git
+### Stack
+| Component | Technology |
+|-----------|-----------|
+| App server | Gunicorn (Django WSGI) |
+| Database | PostgreSQL 15 |
+| Reverse proxy | Traefik (auto TLS via Let's Encrypt) |
+| Container | Docker + Docker Compose |
+| CI/CD | GitHub Actions |
+| Live URL | [sms-demo.sequenceit.com](https://sms-demo.sequenceit.com) |
+
+### CI/CD Pipeline
+
+Every push to `main` triggers 3 automatic stages:
+
+```
+Push to main
+     │
+     ▼
+🧪 Test          — Django test suite (Python 3.10 & 3.11)
+     │ passes
+     ▼
+🐳 Build & Push  — Docker image → Docker Hub (tagged latest + SHA)
+     │ passes
+     ▼
+🚀 Deploy        — SSH into VPS → pull latest image → restart container
 ```
 
-- Create and activate a python virtual environment
+### Required GitHub Secrets
+
+Set these in **Settings → Secrets and variables → Actions**:
+
+| Secret | Description |
+|--------|-------------|
+| `VPS_HOST` | VPS IP or hostname |
+| `VPS_USER` | SSH user (e.g. `ubuntu`) |
+| `VPS_SSH_KEY` | Private SSH key (PEM format) |
+| `VPS_PORT` | SSH port (usually `22`) |
+| `DOCKER_USERNAME` | Docker Hub username |
+| `DOCKER_PASSWORD` | Docker Hub access token |
+| `SECRET_KEY` | Django secret key |
+| `DB_PASSWORD` | PostgreSQL password |
+| `EMAIL_HOST_USER` | SMTP email user |
+| `EMAIL_HOST_PASSWORD` | SMTP email password |
+| `STRIPE_SECRET_KEY` | Stripe secret key |
+| `STRIPE_PUBLISHABLE_KEY` | Stripe publishable key |
+
+---
+
+## 🛠️ Local Development
+
+### Prerequisites
+- Python 3.10+
+- pip
+
+### Setup
 
 ```bash
-pip install -r requirements.txt
-```
+# 1. Clone the repo
+git clone https://github.com/sequenceit-git/sequenceIT-learn.git
+cd sequenceIT-learn
 
-- Create `.env` file inside the root directory
+# 2. Create and activate a virtual environment
+python -m venv .venv
+source .venv/bin/activate       # macOS/Linux
+# .venv\Scripts\activate        # Windows
 
-- Copy and paste everything in the `.env.example` file into the `.env` file. Don't forget to customize the variable values
+# 3. Install dependencies
+pip install -r requirements/local.txt
 
-```bash
+# 4. Set up environment variables
+cp .env.example .env
+# Edit .env and fill in your values
+
+# 5. Run migrations
 python manage.py migrate
-```
 
-```bash
+# 6. Create a superuser
 python manage.py createsuperuser
-```
 
-```bash
+# 7. Start the development server
 python manage.py runserver
 ```
 
-Last but not least, go to this address http://127.0.0.1:8000
+Visit: **http://127.0.0.1:8000**
 
-#### _Check [this page](https://adilmohak.github.io/dj-lms-starter/) for more insight and support._
+### Local Dev with Docker
 
-# References
+```bash
+# Run just the Django app (SQLite, hot-reload)
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+```
 
-- Quiz part: https://github.com/tomwalker/django_quiz
+---
 
-#### Show your support by ⭐️ this project!
+## 🐳 Production Deployment (VPS)
+
+### One-time VPS setup
+
+```bash
+# Install Docker
+curl -fsSL https://get.docker.com | sh
+sudo usermod -aG docker $USER
+
+# Create app directory
+mkdir -p /opt/sequenceit-learn && cd /opt/sequenceit-learn
+
+# Create your .env file
+cp .env.example .env && nano .env
+
+# Start all services
+docker compose up -d
+
+# Create superuser
+docker compose exec web python manage.py createsuperuser
+```
+
+### Useful commands
+
+```bash
+# View running containers
+docker compose ps
+
+# Follow logs
+docker compose logs -f web
+
+# Manual redeploy
+docker compose pull web && docker compose up -d --no-deps --force-recreate web
+
+# Database backup
+docker compose exec db pg_dump -U sequenceit sequenceit > backup_$(date +%Y%m%d).sql
+
+# Run any Django command
+docker compose exec web python manage.py <command>
+```
+
+---
+
+## 📁 Project Structure
+
+```
+sequenceIT-learn/
+├── accounts/          # User management (Student, Lecturer, Admin)
+├── config/            # Django settings, URLs, WSGI/ASGI
+├── core/              # Dashboard, home, sessions, semesters
+├── course/            # Programs, courses, allocation, registration
+├── payments/          # Stripe & GoPay integration
+├── quiz/              # Full quiz engine
+├── result/            # Grade & assessment results
+├── search/            # Global search
+├── templates/         # All HTML templates
+├── static/            # CSS, JS, vendor assets
+├── media/             # User-uploaded files
+├── nginx/             # Nginx config (for non-Traefik setups)
+├── scripts/           # entrypoint.sh, data seeders
+├── requirements/
+│   ├── base.txt       # Shared dependencies
+│   ├── local.txt      # Dev-only (black, django-extensions)
+│   └── production.txt # Prod (gunicorn, psycopg2, etc.)
+├── Dockerfile
+├── docker-compose.yml
+├── docker-compose.dev.yml
+└── .github/
+    └── workflows/
+        └── django.yml # CI/CD pipeline
+```
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Check the [`TODO.md`](TODO.md) for open tasks.
+
+1. Fork the repo
+2. Create a feature branch: `git checkout -b feat/your-feature`
+3. Commit your changes: `git commit -m 'feat: add your feature'`
+4. Push to the branch: `git push origin feat/your-feature`
+5. Open a Pull Request
+
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) before submitting.
+
+---
+
+## 📄 License
+
+This project is licensed under the [MIT License](LICENSE).
+
+---
+
+## 🔗 References
+
+- Quiz engine inspired by: [django_quiz](https://github.com/tomwalker/django_quiz)
+
+---
+
+<div align="center">
+  <strong>Built with ❤️ by the SequenceIT team</strong><br/>
+  <a href="https://sequenceit.com">sequenceit.com</a>
+</div>
