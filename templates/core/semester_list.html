@@ -11,81 +11,75 @@
     </ol>
 </nav>
 
-{% if request.user.is_superuser %}
-<div class="manage-wrap">
-    <a class="btn btn-primary" href="{% url 'add_semester' %}"><i class="fas fa-plus"></i>{% trans 'Add New Semester' %}</a>
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+    <h2 class="m-0"><i data-lucide="calendar" class="me-2 text-primary"></i>{% trans 'Academic Semesters' %}</h2>
+    {% if request.user.is_superuser %}
+    <div class="d-flex gap-2">
+        <a class="btn btn-primary btn-sm" href="{% url 'add_semester' %}"><i data-lucide="plus" class="me-2"></i>{% trans 'Add New Semester' %}</a>
+    </div>
+    {% endif %}
 </div>
-{% endif %}
-
-<div class="title-1"><i class="fas fa-calendar-alt"></i>{% trans 'Semester List' %}</div>
 
 {% include 'snippets/messages.html' %}
 
-<div class="table-responsive table-shadow p-0 mt-5">
-    <table class="table">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th> {% trans 'Semester' %} </th>
-                <th> {% trans 'Is Current semester' %} </th>
-                <th> {% trans 'Session' %} </th>
-                <th> {% trans 'Next Semester Begins' %} </th>
-                {% if request.user.is_superuser %}
-                <th> {% trans 'Actions' %} </th>
-                {% endif %}
-            </tr>
-        </thead>
-        <tbody>
-            {% for semester in semesters %}
-            <tr>
-                <td> {{ forloop.counter }}.</td>
-                <td>{{ semester.semester }}</td>
-                <th>
-                    {% if semester.is_current_semester == False %}
-                    <i class="fas fa-times-circle fa-1-5x danger"></i>
-                    {% else %}
-                    <i class="fas fa-check-circle fa-1-5x"></i>
-                    <i class="icon-times-circle"></i>
+<div class="card p-3">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle m-0">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>{% trans 'Semester' %}</th>
+                    <th>{% trans 'Is Current Semester' %}</th>
+                    <th>{% trans 'Session' %}</th>
+                    <th>{% trans 'Next Semester Begins' %}</th>
+                    {% if request.user.is_superuser %}
+                    <th class="text-end">{% trans 'Actions' %}</th>
                     {% endif %}
-                </th>
-                <td>{{ semester.session }}</td>
-                <td>{{ semester.next_semester_begins }}</td>
-
-                {% if request.user.is_superuser %}
-                <td>
-                    <div class="update-delete">
-                        <a href="{% url 'edit_semester' pk=semester.pk %}" class="update" title="{% trans 'Edit' %}"><i
-                                class="fas fa-pencil-alt"></i></a>
-                        <a href="{% url 'delete_semester' pk=semester.pk %}" class="delete" title="{% trans 'Delete' %}"><i
-                                class="fas fa-trash-alt"></i></a>
-                    </div>
-                </td>
-                {% endif %}
-
+                </tr>
+            </thead>
+            <tbody>
+                {% for semester in semesters %}
+                <tr>
+                    <td>{{ forloop.counter }}.</td>
+                    <td class="fw-semibold">{{ semester.semester }}</td>
+                    <td>
+                        {% if semester.is_current_semester == True %}
+                        <span class="text-success d-inline-flex align-items-center"><i data-lucide="check-circle" class="me-1"></i> {% trans 'Active' %}</span>
+                        {% else %}
+                        <span class="text-muted d-inline-flex align-items-center"><i data-lucide="x-circle" class="me-1"></i> {% trans 'Inactive' %}</span>
+                        {% endif %}
+                    </td>
+                    <td><span class="badge bg-light-aqua">{{ semester.session }}</span></td>
+                    <td>{{ semester.next_semester_begins }}</td>
+                    {% if request.user.is_superuser %}
+                    <td class="text-end">
+                        <div class="dropdown d-inline-block">
+                            <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i data-lucide="more-vertical"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="{% url 'edit_semester' pk=semester.pk %}"><i data-lucide="edit" class="me-2 text-primary"></i>{% trans 'Edit' %}</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="{% url 'delete_semester' pk=semester.pk %}"><i data-lucide="trash-2" class="me-2 text-danger"></i>{% trans 'Delete' %}</a></li>
+                            </ul>
+                        </div>
+                    </td>
+                    {% endif %}
+                </tr>
                 {% empty %}
-            <tr>
-                <td></td>
-                <td></td>
-                <td>
-                    <span class="text-danger">
-                        {% trans 'No Semester.' %}
-                        {% if request.user.is_superuser %}
-                        <a href="{% url 'add_semester' %}">
-                            <i class="primary" style="font-size: 22px;">
-                                {% trans 'Add Semester Now.' %}
-                            </i>
-                            {% endif %}
-                        </a>
-                    </span>
-                </td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+                <tr>
+                  <td colspan="6" class="text-center py-4">
+                      <div class="text-muted mb-2">{% trans 'No Semester found.' %}</div>
+                      {% if request.user.is_superuser %}
+                      <a class="btn btn-primary btn-sm d-inline-flex align-items-center" href="{% url 'add_semester' %}">
+                          <i data-lucide="plus" class="me-2"></i>{% trans 'Add Semester Now' %}
+                      </a>
+                      {% endif %}
+                  </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endblock content %}

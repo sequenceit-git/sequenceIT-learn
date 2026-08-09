@@ -52,9 +52,16 @@ class SessionFactory(DjangoModelFactory):
     class Meta:
         model = Session
 
-    session: str = LazyAttribute(lambda x: str(fake.random_int(min=2020, max=2030)))
+    session: str = LazyAttribute(lambda x: str(fake.random_int(min=2020, max=2035)))
     is_current_session: bool = fake.boolean(chance_of_getting_true=50)
     next_session_begins = LazyAttribute(lambda x: fake.future_datetime())
+
+    @classmethod
+    def _create(cls, model_class: type, *args, **kwargs) -> Session:
+        session, created = Session.objects.get_or_create(
+            session=kwargs.get("session"), defaults=kwargs
+        )
+        return session
 
 
 class SemesterFactory(DjangoModelFactory):
@@ -75,6 +82,15 @@ class SemesterFactory(DjangoModelFactory):
     is_current_semester: bool = fake.boolean(chance_of_getting_true=50)
     session: Session = SubFactory(SessionFactory)
     next_semester_begins = LazyAttribute(lambda x: fake.future_datetime())
+
+    @classmethod
+    def _create(cls, model_class: type, *args, **kwargs) -> Semester:
+        semester, created = Semester.objects.get_or_create(
+            semester=kwargs.get("semester"),
+            session=kwargs.get("session"),
+            defaults=kwargs
+        )
+        return semester
 
 
 class ActivityLogFactory(DjangoModelFactory):

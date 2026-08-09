@@ -20,70 +20,74 @@
     </ol>
 </nav>
 
-{% if request.user.is_superuser or request.user.is_lecturer %}
-<div class="manage-wrap">
-    <a class="btn btn-primary" href="{% url 'quiz_create' course.slug %}"><i class="fas fa-plus"></i>{% trans 'Add Quiz' %}</a>
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+    <h2 class="m-0"><i data-lucide="help-circle" class="me-2 text-primary"></i>{% trans 'Quizzes' %} <span class="text-muted" style="font-size: 1.1rem;">[{{ course|truncatechars:25 }}]</span></h2>
+    {% if request.user.is_superuser or request.user.is_lecturer %}
+    <div class="d-flex gap-2">
+        <a class="btn btn-primary btn-sm" href="{% url 'quiz_create' course.slug %}"><i data-lucide="plus" class="me-2"></i>{% trans 'Add Quiz' %}</a>
+    </div>
+    {% endif %}
 </div>
-{% endif %}
-
-<div class="title-1">{% trans 'Quizzes' %} [{{ course|truncatechars:25 }}]</div>
-<br>
-<br>
 
 {% include 'snippets/messages.html' %}
 
-<div class="container">
-
-    <div class="row">
+<div class="container-fluid p-0">
+    <div class="row g-3">
         {% for quiz in quizzes %}
-        <div class="col-md-4 mb-2">
-            <div class="card p-2 quiz-wrapper">
-                <div class="d-flex justify-content-between align-items-center text-success mb-4">
-                    <em class="text-left">{{ quiz.category|title }} {% trans 'Quiz' %}</em>
-                    <div class="text-right text-light bg-danger px-2 small rounded">
-                        {{ quiz.get_questions.count }} {% trans 'Questions' %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card p-3 h-100 d-flex flex-column justify-content-between">
+                <div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="text-success small fw-semibold"><i data-lucide="tag" class="me-1"></i>{{ quiz.category|title }}</span>
+                        <span class="badge bg-light-orange text-warning">
+                            {{ quiz.get_questions.count }} {% trans 'Questions' %}
+                        </span>
                     </div>
+
+                    <h5 class="fw-bold mb-2">{{ quiz.title|title }}</h5>
+
+                    <p class="text-muted small mb-3">
+                        {% if quiz.description %}
+                        {{ quiz.description }}
+                        {% else %}
+                        {% trans 'No description set.' %}
+                        {% endif %}
+                    </p>
+
+                    {% if quiz.single_attempt %}
+                    <div class="alert alert-warning py-1 px-2 mb-3 small d-flex align-items-center" style="font-size: 0.8rem;">
+                        <i data-lucide="alert-triangle" class="me-2 text-warning"></i>
+                        {% trans "One attempt only" %}
+                    </div>
+                    {% endif %}
                 </div>
 
-                <h6>{{ quiz.title|title }}</h6>
-
-                {% if quiz.description %}
-                <p class="text-muted small">{{ quiz.description }}</p>
-                {% else %}
-                <p class="text-muted small">No description set.</p>
-                {% endif %}
-
-                {% if quiz.single_attempt %}
-                <p class="p-2 bg-light-warning small">{% trans "You will only get one attempt at this quiz" %}.</p>
-                {% endif %}
-
-                <div class="d-flex align-items-center">
-                    <a class="btn btn-block btn-secondary w-100" href="{% url 'quiz_take' pk=course.pk slug=quiz.slug %}">{% trans "Start quiz" %} &raquo;</a>
+                <div class="d-flex align-items-center gap-2 mt-auto">
+                    <a class="btn btn-secondary btn-sm w-100" href="{% url 'quiz_take' pk=course.pk slug=quiz.slug %}">
+                        {% trans "Start Quiz" %} &raquo;
+                    </a>
 
                     {% if request.user.is_superuser or request.user.is_lecturer %}
-                        <div class="dropup">
-                            <button class="btn btn-sm p-0 ms-2" type="button" data-bs-toggle="dropdown"><i class="fas fa-ellipsis-v m-0"></i></button>
-                            <div class="dropdown-menu" aria-labelledby="dropdown01">
-                                <div class="dropdown-item">
-                                    <a href="{% url 'quiz_update' slug=course.slug pk=quiz.id %}" class="update"><i class="unstyled me-2 fas fa-pencil-alt"></i>{% trans 'Edit' %}</a>
-                                </div>
-                                <div class="dropdown-item">
-                                    <a href="{% url 'quiz_delete' slug=course.slug pk=quiz.id %}" class="delete"><i class="unstyled me-2 fas fa-trash-alt"></i>{% trans 'Delete' %}</a>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i data-lucide="more-vertical" class="m-0"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{% url 'quiz_update' slug=course.slug pk=quiz.id %}"><i data-lucide="edit" class="me-2 text-primary"></i>{% trans 'Edit' %}</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="{% url 'quiz_delete' slug=course.slug pk=quiz.id %}"><i data-lucide="trash-2" class="me-2 text-danger"></i>{% trans 'Delete' %}</a></li>
+                        </ul>
+                    </div>
                     {% endif %}
                 </div>
             </div>
         </div>
-
         {% empty %}
-        <h4 class="text-center mt-5 py-5 text-muted">
-            <i class="fa-regular fa-folder-open me-2"></i> Course quizzes will appear here.
-        </h4>
+        <div class="col-12 text-center py-5 text-muted">
+            <h4 class="text-muted"><i data-lucide="folder-open" class="me-2"></i> {% trans 'Course quizzes will appear here.' %}</h4>
+        </div>
         {% endfor %}
     </div>
-
 </div>
 {% endblock %}
 

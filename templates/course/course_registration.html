@@ -35,7 +35,7 @@
         <p class="form-title fw-bold">{% trans 'Course Add' %}</p>
         <div class="container">
             <div class="d-flex justify-content-between mb-3">
-                <button title="{% trans 'Save Score' %}" type="submit" class="btn btn-primary"><i class="fa fa-plus"></i> {% trans 'Add Selected' %}</button>
+                <button title="{% trans 'Save Score' %}" type="submit" class="btn btn-primary"><i data-lucide="plus" class="me-1"></i> {% trans 'Add Selected' %}</button>
             </div>
 
             <div class="table-responsive p-0 px-2 mt-2">
@@ -189,8 +189,8 @@
         <form action="{% url 'course_drop' %}" method="POST">
             {% csrf_token %}
             <div class="d-flex justify-content-between mb-4">
-                <button type="submit" class="btn btn-primary">
-                    <i class="fa fa-times"></i> {% trans 'Drop Selected' %}
+                <button type="submit" class="btn btn-danger">
+                    <i data-lucide="trash-2" class="me-1"></i> {% trans 'Drop Selected' %}
                 </button>
             </div>
 
@@ -258,7 +258,7 @@
 </div>
 
 <a class="btn btn-sm btn-secondary mt-3" href="{% url 'course_registration_form' %}" target="_blank" title="{% trans 'Print Registration Form' %}">
-    <i class="fas fa-print"></i> {% trans 'Print Registerd Courses' %}
+    <i data-lucide="printer" class="me-1"></i> {% trans 'Print Registered Courses' %}
 </a>
 
 {% endif %}

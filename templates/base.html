@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
-    <title>{% block title %}DjangoSMS{% endblock title %}</title>
+    <title>{% block title %}SequenceIT Learn{% endblock title %}</title>
 
     <link rel="shortcut icon" href="{% static 'img/favicon.png' %}" type="image/x-icon">
 
@@ -19,6 +19,20 @@
     <link rel="stylesheet" type="text/css" href="{% static 'vendor/bootstrap-5.3.2/css/bootstrap.min.css' %}">
 
     <link rel="stylesheet" type="text/css" href="{% static 'css/style.min.css' %}">
+
+    <!-- Google Fonts: Outfit and JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Custom Modern UI Theme Overrides -->
+    <link rel="stylesheet" type="text/css" href="{% static 'css/modern-theme.css' %}">
+
+    <!-- Lucide Icons Library -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Chart.js — loaded globally so SPA pages can use it without re-fetching -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <!-- <script src="https://js.stripe.com/v3/"></script> -->
     {% block header %}{% endblock %}
@@ -49,6 +63,160 @@
 
     {% block js %}
     {% endblock js %}
+    <script>
+        lucide.createIcons();
+
+        // Single Page Application (SPA) routing engine
+        function loadPage(url, pushState = true) {
+            const mainContent = document.getElementById("main-content");
+            if (!mainContent) {
+                window.location.href = url;
+                return;
+            }
+            
+            mainContent.style.opacity = "0.2";
+            mainContent.style.transition = "opacity 0.15s ease";
+
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) throw new Error("HTTP error " + response.status);
+                    return response.text();
+                })
+                .then(htmlText => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(htmlText, "text/html");
+                    
+                    // Swap main content panel
+                    const newContent = doc.getElementById("main-content");
+                    if (newContent) {
+                        mainContent.innerHTML = newContent.innerHTML;
+                    }
+
+                    // Update page title
+                    const newTitle = doc.querySelector("title");
+                    if (newTitle) {
+                        document.title = newTitle.innerText;
+                    }
+
+                    // Update browser history
+                    if (pushState) {
+                        history.pushState({ url: url }, "", url);
+                    }
+
+                    // Sync search bar with current URL query
+                    syncSearchInput(url);
+
+                    // Update sidebar active class highlighting
+                    updateActiveSidebar(url);
+
+                    // Re-run script tags contained in the fetched page block
+                    const scripts = mainContent.querySelectorAll("script");
+                    scripts.forEach(oldScript => {
+                        const newScript = document.createElement("script");
+                        Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                        newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                        oldScript.parentNode.replaceChild(newScript, oldScript);
+                    });
+
+                    // Re-render vector outline icons
+                    if (window.lucide) {
+                        lucide.createIcons();
+                    }
+
+                    // Fade back in & smooth scroll top
+                    mainContent.style.opacity = "1";
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                })
+                .catch(err => {
+                    console.error("SPA page load failed:", err);
+                    window.location.href = url; // Hard reload fallback
+                });
+        }
+
+        function updateActiveSidebar(url) {
+            const path = new URL(url, window.location.origin).pathname;
+            const sidebarLinks = document.querySelectorAll("#side-nav ul li");
+            sidebarLinks.forEach(li => {
+                const link = li.querySelector("a");
+                if (link) {
+                    const linkPath = new URL(link.getAttribute("href"), window.location.origin).pathname;
+                    if (path === linkPath) {
+                        li.classList.add("active");
+                    } else {
+                        li.classList.remove("active");
+                    }
+                }
+            });
+        }
+
+        // Intercept local page clicks
+        document.addEventListener("click", function(e) {
+            const link = e.target.closest("a");
+            if (!link) return;
+            
+            const href = link.getAttribute("href");
+            if (!href || href.startsWith("#") || href.startsWith("javascript:") || link.target === "_blank") return;
+            
+            try {
+                const urlObj = new URL(link.href);
+                if (urlObj.origin !== window.location.origin) return;
+                
+                // Do not intercept logout, admin, language switch, or dashboard (needs full reload for charts)
+                if (
+                    urlObj.pathname.includes("/logout") ||
+                    urlObj.pathname.includes("/admin/") ||
+                    urlObj.pathname.includes("/i18n/") ||
+                    urlObj.pathname.includes("/dashboard/")
+                ) return;
+                
+                e.preventDefault();
+                loadPage(link.href);
+            } catch (err) {
+                // Ignore parse errors and let default navigation occur
+            }
+        });
+
+        // Intercept GET form submissions (search bar) via SPA
+        document.addEventListener("submit", function(e) {
+            const form = e.target;
+            // Only intercept GET forms (not POST like set_language)
+            if (!form || form.method.toUpperCase() !== "GET") return;
+
+            try {
+                const action = form.getAttribute("action") || window.location.href;
+                const formData = new FormData(form);
+                const params = new URLSearchParams();
+                for (const [key, value] of formData.entries()) {
+                    if (value) params.append(key, value);
+                }
+                const url = new URL(action, window.location.origin);
+                url.search = params.toString();
+
+                if (url.origin !== window.location.origin) return;
+
+                e.preventDefault();
+                loadPage(url.toString());
+            } catch (err) {
+                // Let the form submit normally on error
+            }
+        });
+
+        // Sync navbar search input with current page query after each SPA nav
+        function syncSearchInput(url) {
+            const searchInput = document.getElementById("primary-search");
+            if (!searchInput) return;
+            try {
+                const urlObj = new URL(url, window.location.origin);
+                const q = urlObj.searchParams.get("q") || "";
+                searchInput.value = q;
+            } catch (err) {}
+        }
+
+        // Listen for history back/forward navigation
+        window.addEventListener("popstate", function(e) {
+            loadPage(window.location.href, false);
+        });
+    </script>
 </body>
 
 </html>

@@ -14,29 +14,29 @@
 
 {% include 'snippets/messages.html' %}
 
-<div class="title-1 mb-3"><i class="fas fa-table"></i>{% trans 'Manage Score' %}</div>
+<h2 class="mb-4"><i data-lucide="edit" class="me-2 text-primary"></i>{% trans 'Manage Score' %}</h2>
 
 {% if current_semester %}
 <div class="row">
-    <div class="col-md-8">
-        <div class="card text-center">
-            <p class="form-title">
-                {{ current_semester }} {% trans 'Semester' %} - <i class="result-title">{{ current_session }}</i>
-            </p>
-            <div class="container">
-                <div class="dropdown">
-                    <button class="btn btn-primary dropdown-toggle mx-auto mb-2" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <div class="col-md-8 col-lg-6 mx-auto">
+        <div class="card p-4 text-center">
+            <h5 class="fw-bold mb-3 text-primary">
+                {{ current_semester }} {% trans 'Semester' %} &mdash; <span class="text-dark">{{ current_session }}</span>
+            </h5>
+            <div class="card-body p-0 mt-3">
+                <div class="dropdown mb-3">
+                    <button class="btn btn-primary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                         {% trans 'Select Your Course Here' %}
                     </button>
-                    <div class="dropdown-menu">
+                    <ul class="dropdown-menu w-100">
                         {% for course in courses %}
-                            <a class="dropdown-item" href="{% url 'add_score_for' course.id %}" title="{{ course.code }}">{{ course.title }}</a>
+                            <li><a class="dropdown-item" href="{% url 'add_score_for' course.id %}" title="{{ course.code }}">{{ course.title }}</a></li>
                         {% empty %}
-                            <p class="dropdown-item">{% trans 'No course.' %}</p>
+                            <li><p class="dropdown-item text-muted m-0">{% trans 'No course.' %}</p></li>
                         {% endfor %}
-                    </div>
+                    </ul>
                 </div>
-                <p>{% trans 'To manage scores, please select the course using the button above.' %}</p>
+                <p class="text-muted small m-0">{% trans 'To manage scores, please select the course using the button above.' %}</p>
             </div>
         </div>
     </div>

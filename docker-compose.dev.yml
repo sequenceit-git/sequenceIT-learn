@@ -1,0 +1,28 @@
+version: "3.9"
+
+# ============================================================
+# SkyLearn — Local Development Override
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+# ============================================================
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app  # Mount source code for live reload
+    environment:
+      - DEBUG=True
+      - DB_ENGINE=django.db.backends.sqlite3
+      - DB_NAME=/app/db.sqlite3
+    ports:
+      - "8000:8000"
+    depends_on: []  # No DB dependency for SQLite dev mode
+
+  db:
+    profiles: ["postgres"]  # Only start if explicitly requested
+
+  nginx:
+    profiles: ["nginx"]  # Skip nginx in local dev

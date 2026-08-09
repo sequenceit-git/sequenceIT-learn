@@ -28,7 +28,9 @@ SECRET_KEY = config(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DEBUG", default=True, cast=bool)
 
-ALLOWED_HOSTS = ["127.0.0.1", "adilmohak1.pythonanywhere.com"]
+# Parse ALLOWED_HOSTS from environment (comma-separated), with sensible defaults
+_allowed_hosts_env = config("ALLOWED_HOSTS", default="127.0.0.1,localhost")
+ALLOWED_HOSTS = [h.strip() for h in _allowed_hosts_env.split(",") if h.strip()]
 
 # change the default user models to our custom model
 AUTH_USER_MODEL = "accounts.User"
@@ -107,12 +109,29 @@ WSGI_APPLICATION = "config.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
+# Database
+# Use PostgreSQL in production (set DB_ENGINE env var), otherwise fall back to SQLite
+_db_engine = config("DB_ENGINE", default="django.db.backends.sqlite3")
+
+if _db_engine == "django.db.backends.postgresql":
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": config("DB_NAME", default="sequenceit"),
+            "USER": config("DB_USER", default="sequenceit"),
+            "PASSWORD": config("DB_PASSWORD", default=""),
+            "HOST": config("DB_HOST", default="db"),
+            "PORT": config("DB_PORT", default="5432"),
+            "CONN_MAX_AGE": 60,
+        }
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": config("DB_NAME", default=os.path.join(BASE_DIR, "db.sqlite3")),
+        }
+    }
 
 # https://docs.djangoproject.com/en/stable/ref/settings/#std:setting-DEFAULT_AUTO_FIELD
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

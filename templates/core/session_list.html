@@ -11,75 +11,73 @@
     </ol>
 </nav>
 
-{% if request.user.is_superuser %}
-<div class="manage-wrap">
-    <a class="btn btn-primary" href="{% url 'add_session' %}"><i class="fas fa-plus"></i>{% trans 'Add New Session' %}</a>
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+    <h2 class="m-0"><i data-lucide="calendar" class="me-2 text-primary"></i>{% trans 'Academic Sessions' %}</h2>
+    {% if request.user.is_superuser %}
+    <div class="d-flex gap-2">
+        <a class="btn btn-primary btn-sm" href="{% url 'add_session' %}"><i data-lucide="plus" class="me-2"></i>{% trans 'Add New Session' %}</a>
+    </div>
+    {% endif %}
 </div>
-{% endif %}
-
-<div class="title-1"><i class="fas fa-calendar-week"></i>{% trans 'Session List' %}</div>
 
 {% include 'snippets/messages.html' %}
 
-<div class="table-responsive table-shadow p-0 mt-5">
-    <table class="table">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th> {% trans 'Session' %} </th>
-                <th> {% trans 'Is Current Session' %} </th>
-                <th> {% trans 'Next Session Begins' %} </th>
-                {% if request.user.is_superuser %}
-                <th> {% trans 'Actions' %} </th>
-                {% endif %}
-            </tr>
-        </thead>
-        <tbody>
-            {% for session in sessions %}
-            <tr>
-                <td>{{ forloop.counter }}.</td>
-                <td>{{ session.session }}</td>
-                <th>
-                    {% if session.is_current_session == True %}
-                    <i class="fas fa-check-circle fa-1-5x"></i>
-                    {% else %}
-                    <i class="fas fa-times-circle fa-1-5x danger"></i>
+<div class="card p-3">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle m-0">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>{% trans 'Session' %}</th>
+                    <th>{% trans 'Is Current Session' %}</th>
+                    <th>{% trans 'Next Session Begins' %}</th>
+                    {% if request.user.is_superuser %}
+                    <th class="text-end">{% trans 'Actions' %}</th>
                     {% endif %}
-                </th>
-                <td>{{ session.next_session_begins }}</td>
-
-                {% if request.user.is_superuser %}
-                <td> <div class="update-delete">
-                    <a href="{% url 'edit_session' pk=session.pk %}" class="update" title="{% trans 'Edit' %}"><i class="fas fa-pencil-alt"></i></a>
-                    <a href="{% url 'delete_session' pk=session.pk %}" class="delete" title="{% trans 'Delete' %}"><i class="fas fa-trash-alt"></i></a>
-                    </div>
-                </td>
-                {% endif %}
-                
+                </tr>
+            </thead>
+            <tbody>
+                {% for session in sessions %}
+                <tr>
+                    <td>{{ forloop.counter }}.</td>
+                    <td class="fw-semibold">{{ session.session }}</td>
+                    <td>
+                        {% if session.is_current_session == True %}
+                        <span class="text-success d-inline-flex align-items-center"><i data-lucide="check-circle" class="me-1"></i> {% trans 'Active' %}</span>
+                        {% else %}
+                        <span class="text-muted d-inline-flex align-items-center"><i data-lucide="x-circle" class="me-1"></i> {% trans 'Inactive' %}</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ session.next_session_begins }}</td>
+                    {% if request.user.is_superuser %}
+                    <td class="text-end">
+                        <div class="dropdown d-inline-block">
+                            <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i data-lucide="more-vertical"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="{% url 'edit_session' pk=session.pk %}"><i data-lucide="edit" class="me-2 text-primary"></i>{% trans 'Edit' %}</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="{% url 'delete_session' pk=session.pk %}"><i data-lucide="trash-2" class="me-2 text-danger"></i>{% trans 'Delete' %}</a></li>
+                            </ul>
+                        </div>
+                    </td>
+                    {% endif %}
+                </tr>
                 {% empty %}
                 <tr>
-                  <td></td>
-                  <td></td>
-                  <td>
-                  <span class="text-danger">
-                    {% trans 'No Session.' %}
-                    {% if request.user.is_superuser %}
-                    <a href="{% url 'add_session' %}">
-                    <i class="primary" style="font-size: 22px;">
-                        {% trans 'Add Session Now.' %}
-                    </i>
-                    {% endif %}
-                    </a>
-                  </span>
-                </td>
-                <td></td>
-                <td></td>
-                <td></td>
+                  <td colspan="5" class="text-center py-4">
+                      <div class="text-muted mb-2">{% trans 'No Session found.' %}</div>
+                      {% if request.user.is_superuser %}
+                      <a class="btn btn-primary btn-sm d-inline-flex align-items-center" href="{% url 'add_session' %}">
+                          <i data-lucide="plus" class="me-2"></i>{% trans 'Add Session Now' %}
+                      </a>
+                      {% endif %}
+                  </td>
                 </tr>
-
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endblock content %}

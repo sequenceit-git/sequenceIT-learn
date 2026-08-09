@@ -1,38 +1,162 @@
-name: Django CI
+name: SkyLearn CI/CD Pipeline
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
+env:
+  DOCKER_IMAGE: ${{ secrets.DOCKER_USERNAME }}/skylearn-web
+
+# ============================================================
+# Jobs
+# ============================================================
 jobs:
-  build:
 
+  # ------------------------------------------------------------
+  # Stage 1: Run Tests
+  # Runs on every push and pull_request to main
+  # ------------------------------------------------------------
+  test:
+    name: 🧪 Test
     runs-on: ubuntu-latest
     env:
-      EMAIL_BACKEND: django.core.mail.backends.console.EmailBackend
-      EMAIL_HOST: smtp.gmail.com
-      EMAIL_PORT: 587
-      EMAIL_USE_TLS: True
-      EMAIL_FROM_ADDRESS: "<email>"
-      EMAIL_HOST_USER: "<email>"
-      EMAIL_HOST_PASSWORD: "<password>"
+      # Use SQLite + console email backend for CI tests
+      DEBUG: "True"
+      SECRET_KEY: "ci-test-secret-key-not-for-production"
+      EMAIL_BACKEND: "django.core.mail.backends.console.EmailBackend"
+      EMAIL_HOST: "smtp.gmail.com"
+      EMAIL_PORT: "587"
+      EMAIL_USE_TLS: "True"
+      EMAIL_FROM_ADDRESS: "test@example.com"
+      EMAIL_HOST_USER: "test@example.com"
+      EMAIL_HOST_PASSWORD: "testpassword"
+      STRIPE_SECRET_KEY: ""
+      STRIPE_PUBLISHABLE_KEY: ""
+      STUDENT_ID_PREFIX: "ugr"
+      LECTURER_ID_PREFIX: "lec"
     strategy:
-      max-parallel: 4
+      max-parallel: 2
       matrix:
-        python-version: [3.8, 3.9]
+        python-version: ["3.10", "3.11"]
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v3
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install Dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-    - name: Run Tests
-      run: |
-        python manage.py test
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
+          cache-dependency-path: "requirements/local.txt"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements/local.txt
+
+      - name: Run tests
+        run: python manage.py test --verbosity=2
+
+
+  # ------------------------------------------------------------
+  # Stage 2: Build & Push Docker Image
+  # Only runs on push to main (not PRs), after tests pass
+  # ------------------------------------------------------------
+  build-and-push:
+    name: 🐳 Build & Push
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    outputs:
+      image_tag: ${{ steps.meta.outputs.tags }}
+      short_sha: ${{ steps.vars.outputs.short_sha }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set short SHA variable
+        id: vars
+        run: echo "short_sha=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Extract Docker metadata (tags & labels)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.DOCKER_IMAGE }}
+          tags: |
+            type=raw,value=latest
+            type=sha,prefix=sha-,format=short
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          dockerfile: Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+
+  # ------------------------------------------------------------
+  # Stage 3: Deploy to VPS
+  # Only runs after successful build, on push to main
+  # ------------------------------------------------------------
+  deploy:
+    name: 🚀 Deploy to VPS
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    environment: production
+
+    steps:
+      - name: Checkout code (for docker-compose files)
+        uses: actions/checkout@v4
+
+      - name: Copy docker-compose files to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT }}
+          source: "docker-compose.yml,nginx/"
+          target: "/opt/skylearn"
+
+      - name: Deploy on VPS via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT }}
+          script: |
+            set -e
+            cd /opt/skylearn
+
+            echo ">>> Pulling latest image..."
+            DOCKER_IMAGE=${{ env.DOCKER_IMAGE }} docker compose pull web
+
+            echo ">>> Restarting web service (zero-downtime)..."
+            DOCKER_IMAGE=${{ env.DOCKER_IMAGE }} docker compose up -d --no-deps --force-recreate web
+
+            echo ">>> Cleaning up old images..."
+            docker image prune -f
+
+            echo ">>> Deployment complete! ✅"
+            docker compose ps

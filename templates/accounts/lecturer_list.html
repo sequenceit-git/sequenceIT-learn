@@ -11,79 +11,80 @@
     </ol>
 </nav>
 
-{% if request.user.is_superuser %}
-<div class="manage-wrap">
-    <a class="btn btn-primary" href="{% url 'add_lecturer' %}"><i class="fas fa-plus"></i>{% trans 'Add Lecturer' %}</a>
-    <a class="btn btn-primary" target="_blank" href="{% url 'lecturer_list_pdf' %}"><i class="fas fa-download"></i> {% trans 'Download pdf' %}</a><!--new-->
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+    <h2 class="m-0"><i data-lucide="graduation-cap" class="me-2 text-primary"></i>{% trans 'Lecturers' %}</h2>
+    {% if request.user.is_superuser %}
+    <div class="d-flex gap-2">
+        <a class="btn btn-primary btn-sm" href="{% url 'add_lecturer' %}"><i data-lucide="plus" class="me-2"></i>{% trans 'Add Lecturer' %}</a>
+        <a class="btn btn-secondary btn-sm" target="_blank" href="{% url 'lecturer_list_pdf' %}"><i data-lucide="download" class="me-2"></i>{% trans 'Download PDF' %}</a>
+    </div>
+    {% endif %}
 </div>
-{% endif %}
-
-<p class="title-1"><i class="fas fa-chalkboard-teacher"></i>{% trans 'Lecturers' %}</p>
 
 {% include 'snippets/messages.html' %}
-{% include 'snippets/filter_form.html' %}
 
-<div class="table-responsive table-shadow table-light table-striped m-0 mt-4">
-    <table class="table">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th> {% trans 'ID No.' %}' </th>
-                <th> {% trans 'Full Name' %} </th>
-                <th> {% trans 'Email' %} </th>
-                <th> {% trans 'Mob No.' %} </th>
-                <th> {% trans 'Address/city' %} </th>
-                <th> {% trans 'Last login' %}  </th>
-                {% if request.user.is_superuser %}
-                <th> {% trans 'Action' %} </th>
-                {% endif %}
-            </tr>
-        </thead>
-        <tbody>
-            {% for lecturer in filter.qs %}
-            <tr>
-                <td> {{ forloop.counter }}.</td>
-                <td>{{ lecturer.username }}</td>
-                <td><a href="{% url 'profile_single' lecturer.id %}">{{ lecturer.get_full_name }}</a></td>
-                <td>{{ lecturer.email }}</td>
-                <td>{{ lecturer.phone }}</td>
-                <td>{{ lecturer.address }}</td>
-                <td>{{ lecturer.last_login }}</td>
-                {% if request.user.is_superuser %}
-                <td> 
-                    <div class="dropdown">
-                        <button class="btn btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fa fa-ellipsis-vertical"></i>
-                        </button>
-                        <ul class="dropdown-menu">
-                          <li><a class="dropdown-item" href="{% url 'staff_edit' pk=lecturer.pk %}"><i class="unstyled me-2 fas fa-edit"></i>{% trans 'Update' %}</a></li>
-                          <li><a class="dropdown-item"  target="_blank" href="{% url 'profile_single' lecturer.id %}?download_pdf=1"><i class="unstyled me-2 fas fa-download"></i>{% trans 'Download PDF' %}</a></li>
-                          <li><a class="dropdown-item text-danger" href="{% url 'lecturer_delete' pk=lecturer.pk %}"><i class="unstyled me-2 fas fa-trash-alt"></i> {% trans 'Delete' %}</a></li>
-                        </ul>
-                    </div>
-                </td>
-                {% endif %}
-                
+<div class="card p-3 mb-4">
+    {% include 'snippets/filter_form.html' %}
+</div>
+
+<div class="card p-3">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle m-0">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>{% trans 'ID No.' %}</th>
+                    <th>{% trans 'Full Name' %}</th>
+                    <th>{% trans 'Email' %}</th>
+                    <th>{% trans 'Mob No.' %}</th>
+                    <th>{% trans 'Address/city' %}</th>
+                    <th>{% trans 'Last login' %}</th>
+                    {% if request.user.is_superuser %}
+                    <th class="text-end">{% trans 'Action' %}</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for lecturer in filter.qs %}
+                <tr>
+                    <td>{{ forloop.counter }}.</td>
+                    <td class="font-monospace small">{{ lecturer.username }}</td>
+                    <td><a href="{% url 'profile_single' lecturer.id %}" class="fw-semibold text-decoration-none">{{ lecturer.get_full_name }}</a></td>
+                    <td>{{ lecturer.email }}</td>
+                    <td>{{ lecturer.phone }}</td>
+                    <td>{{ lecturer.address }}</td>
+                    <td class="small text-muted">{{ lecturer.last_login }}</td>
+                    {% if request.user.is_superuser %}
+                    <td class="text-end"> 
+                        <div class="dropdown d-inline-block">
+                            <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i data-lucide="more-vertical"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                              <li><a class="dropdown-item" href="{% url 'staff_edit' pk=lecturer.pk %}"><i data-lucide="edit" class="me-2 text-primary"></i>{% trans 'Update' %}</a></li>
+                              <li><a class="dropdown-item" target="_blank" href="{% url 'profile_single' lecturer.id %}?download_pdf=1"><i data-lucide="download" class="me-2 text-success"></i>{% trans 'Download PDF' %}</a></li>
+                              <li><hr class="dropdown-divider"></li>
+                              <li><a class="dropdown-item text-danger" href="{% url 'lecturer_delete' pk=lecturer.pk %}"><i data-lucide="trash-2" class="me-2 text-danger"></i>{% trans 'Delete' %}</a></li>
+                            </ul>
+                        </div>
+                    </td>
+                    {% endif %}
+                </tr>
                 {% empty %}
                 <tr>
-                  <td colspan="8">
-                  <span class="text-danger">
-                    {% trans 'No Lecturer(s).' %}
-                    {% if request.user.is_superuser %}
-                    <a href="{% url 'add_lecturer' %}">
-                    <i class="primary" style="font-size: 22px;">
-                        {% trans 'Add Lecturer Now.' %}
-                    </i>
-                    {% endif %}
-                    </a>
-                  </span>
-                </td>
+                  <td colspan="8" class="text-center py-4">
+                      <div class="text-muted mb-2">{% trans 'No Lecturer(s) found.' %}</div>
+                      {% if request.user.is_superuser %}
+                      <a class="btn btn-primary btn-sm d-inline-flex align-items-center" href="{% url 'add_lecturer' %}">
+                          <i data-lucide="plus" class="me-2"></i>{% trans 'Add Lecturer Now' %}
+                      </a>
+                      {% endif %}
+                  </td>
                 </tr>
-
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endblock content %}
 

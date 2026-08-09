@@ -13,91 +13,103 @@
 
 {% include 'snippets/messages.html' %}
 
-<div class="title-1"><i class="fa fa-spell-check"></i>{% trans 'Assesment Results' %}</div>
-<p>{{ student.level }} {% trans 'Result' %}</p>
+<h2 class="mb-4"><i data-lucide="check-square" class="me-2 text-primary"></i>{% trans 'Assessment Results' %}</h2>
+<p class="text-muted mb-4">{{ student.level }} {% trans 'Result' %}</p>
 
-<div class="table-responsive p-0 px-2 mt-3">
-  <div class="table-title"><u>{% trans 'First Semester:' %}</u></div>
-  <table class="table table-light">
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>{% trans 'Course Title' %}</th>
-        <th>{% trans 'Course Code' %}</th>
-        <th>{% trans 'Cr.Hr(s)' %}</th>
-        <th>{% trans 'Assignment' %}</th>
-        <th>{% trans 'Mid exam' %}</th>
-        <th>{% trans 'Quiz' %}</th>
-        <th>{% trans 'Attendance' %}</th>
-        <th>{% trans 'Final exam' %}</th>
-        <th>{% trans 'Total' %}</th>
-      </tr>
-    </thead>
-    {% for course in courses %}
-    {% if course.course.semester == "First" %}
-    <tbody>
-      <tr class="{% if forloop.counter|divisibleby:2 %}bg-gray{% endif %}">
-        <th scope="row">{{ forloop.counter }}</th>
-        <td><a href="{{ course.course.get_absolute_url }}">{{ course.course.title }}</a></td>
-        <td>{{ course.course.code }}</td>
-        <td>{{ course.course.credit }}</td>
-        <td>{{ course.assignment }}</td>
-        <td>{{ course.mid_exam }}</td>
-        <td>{{ course.quiz }}</td>
-        <td>{{ course.attendance }}</td>
-        <td>{{ course.final_exam }}</td>
-        {% if course.total >= 45 %}
-        <td class="success"><i class="fas fa-check-circle"></i> {{ course.total }}</td>
-        {% else %}
-        <td class="danger"><i class="fas fa-exclamation-circle"></i> {{ course.total }}</td>
+<!-- First Semester Card -->
+<div class="card p-3 mb-4">
+  <h5 class="fw-bold mb-3 text-primary">{% trans 'First Semester' %}</h5>
+  <div class="table-responsive">
+    <table class="table table-hover align-middle m-0">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>{% trans 'Course Title' %}</th>
+          <th>{% trans 'Course Code' %}</th>
+          <th>{% trans 'Cr.Hr(s)' %}</th>
+          <th>{% trans 'Assignment' %}</th>
+          <th>{% trans 'Mid exam' %}</th>
+          <th>{% trans 'Quiz' %}</th>
+          <th>{% trans 'Attendance' %}</th>
+          <th>{% trans 'Final exam' %}</th>
+          <th>{% trans 'Total' %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for course in courses %}
+        {% if course.course.semester == "First" %}
+        <tr>
+          <td>{{ forloop.counter }}.</td>
+          <td><a href="{{ course.course.get_absolute_url }}" class="fw-semibold text-decoration-none">{{ course.course.title }}</a></td>
+          <td class="font-monospace small">{{ course.course.code }}</td>
+          <td>{{ course.course.credit }}</td>
+          <td>{{ course.assignment }}</td>
+          <td>{{ course.mid_exam }}</td>
+          <td>{{ course.quiz }}</td>
+          <td>{{ course.attendance }}</td>
+          <td>{{ course.final_exam }}</td>
+          <td>
+            {% if course.total >= 45 %}
+            <span class="text-success fw-bold d-flex align-items-center"><i data-lucide="check-circle" class="me-1" style="width: 16px; height: 16px;"></i> {{ course.total }}</span>
+            {% else %}
+            <span class="text-danger fw-bold d-flex align-items-center"><i data-lucide="alert-circle" class="me-1" style="width: 16px; height: 16px;"></i> {{ course.total }}</span>
+            {% endif %}
+          </td>
+        </tr>
         {% endif %}
-      </tr>
-    </tbody>
-    {% endif %}
-    {% endfor %}
-  </table>
+        {% empty %}
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
+</div>
 
-  <div class="table-responsive p-3 mt-3">
-    <div class="table-title"><u>{% trans 'Second Semester:' %}</u></div>
-    <table class="table table-light">
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>{% trans 'Course Title' %}</th>
-        <th>{% trans 'Course Code' %}</th>
-        <th>{% trans 'Cr.Hr(s)' %}</th>
-        <th>{% trans 'Assignment' %}</th>
-        <th>{% trans 'Mid exam' %}</th>
-        <th>{% trans 'Quiz' %}</th>
-        <th>{% trans 'Attendance' %}</th>
-        <th>{% trans 'Final exam' %}</th>
-        <th>{% trans 'Total' %}</th>
-      </tr>
-    </thead>
-    {% for course in courses %}
-    {% if course.course.semester == "Second" %}
-    <tbody>
-      <tr>
-        <th scope="row">{{ forloop.counter }}</th>
-        <td><a href="{{ course.course.get_absolute_url }}">{{ course.course.title }}</a></td>
-        <td>{{ course.course.code }}</td>
-        <td>{{ course.course.credit }}</td>
-        <td>{{ course.assignment }}</td>
-        <td>{{ course.mid_exam }}</td>
-        <td>{{ course.quiz }}</td>
-        <td>{{ course.attendance }}</td>
-        <td>{{ course.final_exam }}</td>
-        {% if course.total >= 45 %}
-        <td class="success"><i class="fas fa-check-circle"></i> {{ course.total }}</td>
-        {% else %}
-        <td class="danger"><i class="fas fa-exclamation-circle"></i> {{ course.total }}</td>
+<!-- Second Semester Card -->
+<div class="card p-3 mb-4">
+  <h5 class="fw-bold mb-3 text-primary">{% trans 'Second Semester' %}</h5>
+  <div class="table-responsive">
+    <table class="table table-hover align-middle m-0">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>{% trans 'Course Title' %}</th>
+          <th>{% trans 'Course Code' %}</th>
+          <th>{% trans 'Cr.Hr(s)' %}</th>
+          <th>{% trans 'Assignment' %}</th>
+          <th>{% trans 'Mid exam' %}</th>
+          <th>{% trans 'Quiz' %}</th>
+          <th>{% trans 'Attendance' %}</th>
+          <th>{% trans 'Final exam' %}</th>
+          <th>{% trans 'Total' %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for course in courses %}
+        {% if course.course.semester == "Second" %}
+        <tr>
+          <td>{{ forloop.counter }}.</td>
+          <td><a href="{{ course.course.get_absolute_url }}" class="fw-semibold text-decoration-none">{{ course.course.title }}</a></td>
+          <td class="font-monospace small">{{ course.course.code }}</td>
+          <td>{{ course.course.credit }}</td>
+          <td>{{ course.assignment }}</td>
+          <td>{{ course.mid_exam }}</td>
+          <td>{{ course.quiz }}</td>
+          <td>{{ course.attendance }}</td>
+          <td>{{ course.final_exam }}</td>
+          <td>
+            {% if course.total >= 45 %}
+            <span class="text-success fw-bold d-flex align-items-center"><i data-lucide="check-circle" class="me-1" style="width: 16px; height: 16px;"></i> {{ course.total }}</span>
+            {% else %}
+            <span class="text-danger fw-bold d-flex align-items-center"><i data-lucide="alert-circle" class="me-1" style="width: 16px; height: 16px;"></i> {{ course.total }}</span>
+            {% endif %}
+          </td>
+        </tr>
         {% endif %}
-      </tr>
-    </tbody>
-    {% endif %}
-    {% endfor %}
-  </table>
+        {% empty %}
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 </div>
 
 <br>

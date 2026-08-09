@@ -4,7 +4,6 @@
 
 {% load static %}
 
-
 {% block content %}
 
 {% if user.is_authenticated %}
@@ -18,34 +17,35 @@
 
 {% include 'snippets/messages.html' %}
 
-<div class="row">
+<div class="row g-4">
 
-    <div class="col-md-3 mx-auto">
-        <div class="card  p-2">
-            <div class="text-center">
-                <img src="{{ user.picture.url }}" class="w-100">
-                <ul class="px-2 list-unstyled">
-                    <li>{{ user.get_full_name|title }}</li>
-                    <li><strong>{% trans 'Last login' %}: </strong>{{ user.last_login|date }}</li>
-                    <li><strong>{% trans 'Role' %}: </strong>
-                        {{ user.get_user_role }}
-                    </li>
-                </ul>
+    <!-- Profile Box -->
+    <div class="col-md-4 col-lg-3">
+        <div class="card p-3 text-center">
+            <div class="profile-avatar-container mx-auto mb-3" style="width: 120px; height: 120px;">
+                <img src="{{ user.picture.url }}" class="profile-avatar">
             </div>
-            <hr>
+            <h5 class="fw-bold mb-1">{{ user.get_full_name|title }}</h5>
+            <p class="small text-muted mb-3">{{ user.get_user_role }}</p>
+            
+            <div class="p-2 bg-light rounded text-start mb-3 border border-light">
+                <span class="text-muted d-block small">{% trans 'Last Login' %}</span>
+                <span class="fw-semibold small">{{ user.last_login|date }}</span>
+            </div>
+
             {% if request.user.is_superuser %}
-            <div class="d-flex flex-column">
+            <div class="d-flex flex-column gap-2">
                 {% if user.is_student %}
-                <a href="{% url 'student_edit' pk=user.id %}">
-                    <i class="fas fa-user-edit unstyled"></i><span class="mobile-hide">{% trans 'Edit Profile' %}</span>
+                <a class="btn btn-light btn-sm text-start" href="{% url 'student_edit' pk=user.id %}">
+                    <i data-lucide="user-cog" class="me-2 text-primary"></i>{% trans 'Edit Profile' %}
                 </a>
-                <a href="{% url 'student_program_edit' user.id %}">
-                    <i class="fas fa-pen-to-square unstyled"></i><span class="mobile-hide">{% trans 'Change Program' %}</span>
+                <a class="btn btn-secondary btn-sm text-start" href="{% url 'student_program_edit' user.id %}">
+                    <i data-lucide="edit" class="me-2 text-warning"></i>{% trans 'Change Program' %}
                 </a>
                 {% endif %}
                 {% if user.is_lecturer %}
-                <a href="{% url 'staff_edit' pk=user.id %}">
-                    <i class="fas fa-user-edit unstyled"></i><span class="mobile-hide">{% trans 'Edit Profile' %}</span>
+                <a class="btn btn-light btn-sm text-start" href="{% url 'staff_edit' pk=user.id %}">
+                    <i data-lucide="user-cog" class="me-2 text-primary"></i>{% trans 'Edit Profile' %}
                 </a>
                 {% endif %}
             </div>
@@ -53,76 +53,139 @@
         </div>
     </div>
 
-    <div class="col-md-9 mx-auto">
-        <div class="card">
-            <div class="card-body">
-                <!-- {% if user.is_student %}
-                <p class="form-title"><i class="fas fa-book-open"></i>Enrolled Courses</p>
-                <div class="dashboard-description">
-                    {% if courses %}
-                        <div class="flex">
-                            {% for course in courses %}
-                                <div class="flex"><a class="edit-btn" href="{{ course.get_absolute_url }}">{{ course }}</a></div>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                            <div class="text-danger"><i class="far fa-frown"></i>No courses!</div>
-                    {% endif %}
-                </div>
-                {% endif %} -->
+    <!-- Personal details Card -->
+    <div class="col-md-8 col-lg-9">
+        <div class="card p-4">
     
-                {% if user.is_lecturer %}
-                <p class="fw-bold"><i class="fas fa-book-open"></i> {% trans 'My Courses' %}</p>
-                {% if courses %}
-                <ul>
-                    {% for course in courses %}
-                    <li><a href="{{ course.get_absolute_url }}" class="text-primary">{{ course }}</a></li>
-                    {% endfor %}
-                </ul>
-                {% else %}
-                <div class="text-danger">{% trans 'No courses assigned!' %}</div>
-                {% endif %}
-                <hr>
-                {% endif %}
-    
-                <p class="fw-bold"><i class="me-2 fas fa-user"></i> {% trans 'Personal Info' %}</p>
-                <div class="dashboard-description">
-                    <p><strong>{% trans 'First Name' %}:</strong> {{ user.first_name|title }}</p>
-                    <p><strong>{% trans 'Last Name' %}:</strong> {{ user.last_name|title }}</p>
-                    <p><strong>{% trans 'ID No.' %}:</strong> {{ user.username }}</p>
+            {% if user.is_lecturer %}
+            <h5 class="fw-bold mb-3 d-flex align-items-center">
+                <i data-lucide="book-open" class="me-2 text-primary"></i>{% trans 'My Courses' %}
+            </h5>
+            {% if courses %}
+            <div class="row row-cols-1 row-cols-md-2 g-2 mb-4">
+                {% for course in courses %}
+                <div class="col">
+                    <div class="p-2 rounded bg-light border border-light">
+                        <a href="{{ course.get_absolute_url }}" class="text-primary fw-semibold">{{ course }}</a>
+                    </div>
                 </div>
-                {% if user.is_student %}
-                <hr>
-                <p class="fw-bold"><i class="me-2 fas fa-graduation-cap"></i> {% trans 'Applicant Info' %}</p>
-                <div class="dashboard-description">
-                    <p><strong>{% trans 'School' %}: </strong>Unity College</p>
-                    <p><strong>{% trans 'Level' %}: </strong>{{ level.level }}</p>
-                    <p><strong>{% trans 'Program' %}: </strong>{{ student.program }}</p>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="alert alert-warning py-2 mb-4">{% trans 'No courses assigned!' %}</div>
+            {% endif %}
+            <hr class="my-4 opacity-10">
+            {% endif %}
+
+            <!-- Personal Info -->
+            <h5 class="fw-bold mb-3 d-flex align-items-center">
+                <i data-lucide="user" class="me-2 text-primary"></i>{% trans 'Personal Info' %}
+            </h5>
+            <div class="row row-cols-1 row-cols-sm-3 g-3 mb-4">
+                <div class="col">
+                    <div class="p-2 border-bottom border-light">
+                        <span class="text-muted d-block small">{% trans 'First Name' %}</span>
+                        <span class="fw-semibold">{{ user.first_name|title }}</span>
+                    </div>
                 </div>
-                {% endif %}
-    
-                <hr>
-                <p class="fw-bold"><i class="me-2 fas fa-phone-square-alt"></i>{% trans 'Contact Info' %}</p>
-                <div class="dashboard-description">
-                    <p><strong>{% trans 'Email' %}:</strong> {{ user.email }}</p>
-                    <p><strong>{% trans 'Tel No.' %}:</strong> {{ user.phone }}</p>
-                    <p><strong>{% trans 'Address/city' %}:</strong> {{ user.address }}</p>
+                <div class="col">
+                    <div class="p-2 border-bottom border-light">
+                        <span class="text-muted d-block small">{% trans 'Last Name' %}</span>
+                        <span class="fw-semibold">{{ user.last_name|title }}</span>
+                    </div>
                 </div>
-    
-                <hr>
-                <p class="fw-bold"><i class="me-2 fa fa-calendar-day"></i>{% trans 'Important Dates' %}</p>
-                <div class="dashboard-description">
-                    <p><strong>{% trans 'Last login' %}:</strong> {{ user.last_login }}</p>
-                    {% if current_semester and current_session %}
-                    <p><strong>{% trans 'Academic Year' %}:</strong> {{ current_semester }} {% trans 'Semester' %} {{ current_session }}</p>
-                    {% endif %}
-                    <p><strong>{% trans 'Registered Date' %}:</strong> {{ user.date_joined|date }}</p>
+                <div class="col">
+                    <div class="p-2 border-bottom border-light">
+                        <span class="text-muted d-block small">{% trans 'ID Number' %}</span>
+                        <span class="fw-semibold">{{ user.username }}</span>
+                    </div>
                 </div>
             </div>
+
+            {% if user.is_student %}
+            <!-- Applicant Info -->
+            <hr class="my-4 opacity-10">
+            <h5 class="fw-bold mb-3 d-flex align-items-center">
+                <i data-lucide="graduation-cap" class="me-2 text-primary"></i>{% trans 'Applicant Info' %}
+            </h5>
+            <div class="row row-cols-1 row-cols-sm-3 g-3 mb-4">
+                <div class="col">
+                    <div class="p-2 border-bottom border-light">
+                        <span class="text-muted d-block small">{% trans 'School' %}</span>
+                        <span class="fw-semibold">{% trans 'Unity College' %}</span>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="p-2 border-bottom border-light">
+                        <span class="text-muted d-block small">{% trans 'Level' %}</span>
+                        <span class="fw-semibold">{{ level.level }}</span>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="p-2 border-bottom border-light">
+                        <span class="text-muted d-block small">{% trans 'Program' %}</span>
+                        <span class="fw-semibold">{{ student.program }}</span>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Contact Info -->
+            <hr class="my-4 opacity-10">
+            <h5 class="fw-bold mb-3 d-flex align-items-center">
+                <i data-lucide="phone" class="me-2 text-primary"></i>{% trans 'Contact Info' %}
+            </h5>
+            <div class="row row-cols-1 row-cols-sm-3 g-3 mb-4">
+                <div class="col">
+                    <div class="p-2 border-bottom border-light">
+                        <span class="text-muted d-block small">{% trans 'Email Address' %}</span>
+                        <span class="fw-semibold">{{ user.email }}</span>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="p-2 border-bottom border-light">
+                        <span class="text-muted d-block small">{% trans 'Phone Number' %}</span>
+                        <span class="fw-semibold">{{ user.phone }}</span>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="p-2 border-bottom border-light">
+                        <span class="text-muted d-block small">{% trans 'Address / City' %}</span>
+                        <span class="fw-semibold">{{ user.address }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Important Dates -->
+            <hr class="my-4 opacity-10">
+            <h5 class="fw-bold mb-3 d-flex align-items-center">
+                <i data-lucide="calendar" class="me-2 text-primary"></i>{% trans 'Important Dates' %}
+            </h5>
+            <div class="row row-cols-1 row-cols-sm-3 g-3">
+                <div class="col">
+                    <div class="p-2 border-bottom border-light">
+                        <span class="text-muted d-block small">{% trans 'Registered Date' %}</span>
+                        <span class="fw-semibold">{{ user.date_joined|date }}</span>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="p-2 border-bottom border-light">
+                        <span class="text-muted d-block small">{% trans 'Last Login' %}</span>
+                        <span class="fw-semibold" style="font-size: 0.85rem !important;">{{ user.last_login }}</span>
+                    </div>
+                </div>
+                {% if current_semester and current_session %}
+                <div class="col">
+                    <div class="p-2 border-bottom border-light">
+                        <span class="text-muted d-block small">{% trans 'Academic Session' %}</span>
+                        <span class="fw-semibold">{{ current_semester }} / {{ current_session }}</span>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
         </div>
     </div>
-
-    <div class="col-md-3 mx-auto"></div>
 
 </div>
 {% endif %}

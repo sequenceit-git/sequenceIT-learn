@@ -18,25 +18,28 @@
 </nav>
 
 {% if request.user.is_superuser %}
-<div class="manage-wrap">
-    <a class="btn btn-sm btn-primary" href="{% url 'course_add' pk=program.pk %}"><i class="fas fa-plus"></i>{% trans 'Add Course' %}</a>
+<div class="mb-4">
+    <a class="btn btn-primary btn-sm" href="{% url 'course_add' pk=program.pk %}"><i data-lucide="plus" class="me-1"></i>{% trans 'Add Course' %}</a>
 </div>
 {% endif %}
 
-
 {% if program %}
-<div class="title-1">{{ program.title }}</div>
-{% if program.summary %}
-<p>{{ program.summary }}</p>
-{% endif %}
+<div class="card p-3 mb-4">
+    <h2 class="m-0 text-primary">{{ program.title }}</h2>
+    {% if program.summary %}
+    <p class="text-muted m-0 mt-2">{{ program.summary }}</p>
+    {% endif %}
+</div>
 {% endif %}
 
 {% include 'snippets/messages.html' %}
-{% include 'snippets/filter_form.html' %}
+<div class="card p-3 mb-4">
+    {% include 'snippets/filter_form.html' %}
+</div>
 
-<div class="table-responsive p-0 px-2 mt-5">
-    <div class="table-shadow">
-        <table class="table table-light table-striped">
+<div class="card p-3">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle m-0">
             <thead>
                 <tr>
                     <th>#</th>
@@ -48,7 +51,7 @@
                     <th> {% trans 'Semester' %} </th>
                     <th> {% trans 'Current Semester' %} </th>
                     {% if request.user.is_superuser %}
-                    <th>{% trans 'Action' %}</th>
+                    <th class="text-end">{% trans 'Action' %}</th>
                     {% endif %}
                 </tr>
             </thead>
@@ -56,53 +59,53 @@
                 {% for course in courses %}
                 <tr>
                     <td>{{ forloop.counter }}.</td>
-                    <td><a href="{{ course.get_absolute_url }}">
+                    <td><a href="{{ course.get_absolute_url }}" class="fw-semibold text-decoration-none">
                             {{ course.title }}</a></td>
-                    <td>{{ course.code }}</td>
+                    <td class="font-monospace small">{{ course.code }}</td>
                     <td>{{ course.credit }}</td>
                     <td>{{ course.level }}</td>
                     <td>{{ course.year }}</td>
                     <td>{{ course.semester }}</td>
-                    <th>
-                        {% if course.is_current_semester == False %}
-                        <i class="fas fa-times-circle fa-1-5x danger"></i>
-                        {% elif course.is_current_semester == True %}
-                        <i class="fas fa-check-circle fa-1-5x"></i>
-                        {% endif %}
-                    </th>
-                    {% if request.user.is_superuser %}
                     <td>
-                        <div class="dropstart">
-                            <button class="btn btn-sm" type="button" data-bs-toggle="dropdown" 
-                            data-bs-boundary="window" aria-haspopup="true" aria-expanded="false">
-                                <i class="fas fa-ellipsis-v m-0"></i>
+                        {% if course.is_current_semester == False %}
+                        <span class="text-danger"><i data-lucide="x-circle"></i></span>
+                        {% elif course.is_current_semester == True %}
+                        <span class="text-success"><i data-lucide="check-circle"></i></span>
+                        {% endif %}
+                    </td>
+                    {% if request.user.is_superuser %}
+                    <td class="text-end">
+                        <div class="dropdown d-inline-block">
+                            <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i data-lucide="more-vertical"></i>
                             </button>
-                            <div class="dropdown-menu">
-                                <a class="dropdown-item" href="{% url 'edit_course' slug=course.slug %}">
-                                    <i class="unstyled me-2 fas fa-pencil-alt"></i> {% trans 'Edit' %}
-                                </a>
-                                <a class="dropdown-item" href="{% url 'delete_course' slug=course.slug %}">
-                                    <i class="unstyled me-2 fas fa-trash-alt"></i> {% trans 'Delete' %}
-                                </a>
-                            </div>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'edit_course' slug=course.slug %}">
+                                        <i data-lucide="edit" class="me-2 text-primary"></i> {% trans 'Edit' %}
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item text-danger" href="{% url 'delete_course' slug=course.slug %}">
+                                        <i data-lucide="trash-2" class="me-2 text-danger"></i> {% trans 'Delete' %}
+                                    </a>
+                                </li>
+                            </ul>
                         </div>
                     </td>
                     {% endif %}
                 </tr>
                 {% empty %}
                 <tr>
-                  <td colspan="9">
-                  <span class="text-danger">
-                    {% trans 'No course for this progrm.' %}
+                  <td colspan="9" class="text-center py-4 text-muted">
+                    {% trans 'No course for this program.' %}
                     {% if request.user.is_superuser %}
-                    <a href="{% url 'course_add' pk=program.pk %}" class="text-primary">
-                    <i class="primary" style="font-size: 22px;">
+                    <a href="{% url 'course_add' pk=program.pk %}" class="fw-semibold text-primary ms-1">
                         {% trans 'Add one now.' %}
-                    </i>
-                    {% endif %}
                     </a>
-                  </span>
-                </td>
+                    {% endif %}
+                  </td>
                 </tr>
                 {% endfor %}
             </tbody>

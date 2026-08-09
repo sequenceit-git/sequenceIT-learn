@@ -27,18 +27,18 @@
 </div>
 
 <br>
-<h4 class="title-1">{% trans 'Students result form' %} | {{ course|truncatechars:15 }}</h4>
-<p>{{ course.summary }}</p>
+<h2 class="mb-2">{% trans 'Students Result Form' %}</h2>
+<h6 class="text-muted mb-4">{{ course }} &mdash; {{ course.summary }}</h6>
 
 {% include 'snippets/messages.html' %}
 
 <form action="" method="POST">
     {% csrf_token %}
-    <div class="btn-flex">
-        <button title="Save Score" type="submit" class="btn btn-primary">{% trans 'Save' %}</button>
-        <a target="_blank" href="{% url 'result_sheet_pdf_view' id=course.id %}">
-            <span data-toggle="tooltip" title="Print Result sheet" class="btn btn-warning">
-                <i class="far fa-file-pdf"></i> {% trans 'Grade report' %}
+    <div class="d-flex gap-2 mb-4">
+        <button title="Save Score" type="submit" class="btn btn-primary btn-sm">{% trans 'Save' %}</button>
+        <a target="_blank" href="{% url 'result_sheet_pdf_view' id=course.id %}" class="text-decoration-none">
+            <span data-toggle="tooltip" title="Print Result sheet" class="btn btn-warning btn-sm d-inline-flex align-items-center">
+                <i data-lucide="file-text" class="me-1"></i> {% trans 'Grade report' %}
             </span>
         </a>
     </div>

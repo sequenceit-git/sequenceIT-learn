@@ -15,17 +15,27 @@
     </ol>
 </nav>
     
-<p class="title-1">{{ video.title }}</p>
-<br><br>
+<h2 class="mb-4"><i data-lucide="video" class="me-2 text-primary"></i>{{ video.title }}</h2>
 
-<div class="col-md-10 mx-auto d-block">
-    <div class=""><video src="{{ video.video.url }}" controls ></video></div>
-    <p><i class="fas fa-calendar"></i> {{ video.timestamp|timesince }} {% trans 'ago' %}</p>
-    {% if video.summary %}
-    <p class="text-orange text-center">{{ video.summary }}</p>
-    {% else %}
-    {% trans 'No video description set.' %}
-    {% endif %}
+<div class="row mb-4">
+    <div class="col-lg-10 mx-auto">
+        <div class="card p-3">
+            <div class="ratio ratio-16x9 rounded overflow-hidden mb-3 bg-dark">
+                <video src="{{ video.video.url }}" controls class="w-100 h-100"></video>
+            </div>
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                <span class="text-muted small d-flex align-items-center">
+                    <i data-lucide="calendar" class="me-1 text-primary" style="width: 16px; height: 16px;"></i>
+                    {{ video.timestamp|timesince }} {% trans 'ago' %}
+                </span>
+            </div>
+            {% if video.summary %}
+            <div class="p-3 bg-light rounded border border-light mt-3">
+                <p class="text-muted m-0 small">{{ video.summary }}</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
 </div>
 
 {% endblock content %}

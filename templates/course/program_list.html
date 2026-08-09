@@ -11,28 +11,31 @@
     </ol>
 </nav>
 
-{% if request.user.is_superuser %}
-<div class="manage-wrap">
-    <a class="btn btn-primary" href="{% url 'add_program' %}"><i class="fas fa-plus"></i>{% trans 'Add Program' %}</a>
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+    <h2 class="m-0"><i data-lucide="layers" class="me-2 text-primary"></i>{% trans 'Program List' %}</h2>
+    {% if request.user.is_superuser %}
+    <div class="d-flex gap-2">
+        <a class="btn btn-primary btn-sm" href="{% url 'add_program' %}"><i data-lucide="plus" class="me-2"></i>{% trans 'Add Program' %}</a>
+    </div>
+    {% endif %}
 </div>
-{% endif %}
-
-<div class="title-1"><i class="fas fa-book-open"></i>{% trans 'Program List' %}</div>
-<br><br>
 
 {% include 'snippets/messages.html' %}
-{% include 'snippets/filter_form.html' %}
 
-<div class="table-responsive table-shadow table-light table-striped m-0 mt-4">
-    <div class="table-shadow">
-        <table class="table table-light">
+<div class="card p-3 mb-4">
+    {% include 'snippets/filter_form.html' %}
+</div>
+
+<div class="card p-3">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle m-0">
             <thead>
                 <tr>
                     <th>#</th>
                     <th>{% trans 'Program Name' %}</th>
                     <th>{% trans 'Summary' %}</th>
                     {% if request.user.is_superuser %}
-                    <th>{% trans 'Action' %}</th>
+                    <th class="text-end">{% trans 'Action' %}</th>
                     {% endif %}
                 </tr>
             </thead>
@@ -41,20 +44,21 @@
                 <tr>
                     <td>{{ forloop.counter }}.</td>
                     <td>
-                        <a class="a-list" href="{{ program.get_absolute_url }}">
+                        <a href="{{ program.get_absolute_url }}" class="fw-semibold text-decoration-none">
                             {{ program.title}}
                         </a>
                     </td>
-                    <td>{{ program.summary }} </td>
+                    <td>{{ program.summary }}</td>
                     {% if request.user.is_superuser %}
-                    <td>
-                        <div class="dropdown">
-                            <button class="btn btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fa fa-ellipsis-vertical"></i>
+                    <td class="text-end">
+                        <div class="dropdown d-inline-block">
+                            <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i data-lucide="more-vertical"></i>
                             </button>
-                            <ul class="dropdown-menu">
-                              <li><a class="dropdown-item" href="{% url 'edit_program' pk=program.pk %}"><i class="unstyled me-2 fas fa-edit"></i>{% trans 'Update' %}</a></li>
-                              <li><a class="dropdown-item text-danger" href="{% url 'program_delete' pk=program.pk %}"><i class="unstyled me-2 fas fa-trash-alt"></i>{% trans 'Delete' %}</a></li>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                              <li><a class="dropdown-item" href="{% url 'edit_program' pk=program.pk %}"><i data-lucide="edit" class="me-2 text-primary"></i>{% trans 'Update' %}</a></li>
+                              <li><hr class="dropdown-divider"></li>
+                              <li><a class="dropdown-item text-danger" href="{% url 'program_delete' pk=program.pk %}"><i data-lucide="trash-2" class="me-2 text-danger"></i>{% trans 'Delete' %}</a></li>
                             </ul>
                         </div>
                     </td>
@@ -62,23 +66,14 @@
                 </tr>
                 {% empty %}
                 <tr>
-                  <td></td>
-                  <td></td>
-                  <td>
-                  <span class="text-danger">
-                    {% trans 'No program.' %}
-                    {% if request.user.is_superuser %}
-                    <a href="{% url 'add_program' %}">
-                    <i class="primary" style="font-size: 22px;">
-                        {% trans 'Add program now.' %}
-                    </i>
-                    {% endif %}
-                    </a>
-                  </span>
-                </td>
-                <td></td>
-                <td></td>
-                <td></td>
+                  <td colspan="4" class="text-center py-4">
+                      <div class="text-muted mb-2">{% trans 'No program found.' %}</div>
+                      {% if request.user.is_superuser %}
+                      <a class="btn btn-primary btn-sm d-inline-flex align-items-center" href="{% url 'add_program' %}">
+                          <i data-lucide="plus" class="me-2"></i>{% trans 'Add Program Now' %}
+                      </a>
+                      {% endif %}
+                  </td>
                 </tr>
                 {% endfor %}
             </tbody>

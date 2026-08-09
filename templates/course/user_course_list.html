@@ -13,55 +13,62 @@
 </nav>
 
 {% if request.user.is_student %}
-    <div class="title-1">{{ student.program.title }}</div>
-    {% if student.program.summary %}
-        <p>{{ student.program.summary }}</p>
-    {% endif %}
+    <div class="card p-3 mb-4">
+        <h2 class="m-0"><i data-lucide="graduation-cap" class="me-2 text-primary"></i>{{ student.program.title }}</h2>
+        {% if student.program.summary %}
+            <p class="text-muted m-0 mt-2">{{ student.program.summary }}</p>
+        {% endif %}
+    </div>
 {% endif %}
 
 {% if request.user.is_lecturer %}
-    <div class="title-1">{% trans 'My Courses' %}</div>
+    <h2 class="mb-4"><i data-lucide="book-open" class="me-2 text-primary"></i>{% trans 'My Courses' %}</h2>
 {% endif %}
 
 {% include 'snippets/messages.html' %}
 
 {% if request.user.is_student %}
-<div class="table-responsive p-3 mt-3">
-    <h6 class="fw-bold text-primary"><u>{% trans 'Taken Courses:' %}</u></h6>
-    <div class="table-shadow">
-        <table class="table table-light">
+<div class="card p-3 mb-4">
+    <h5 class="fw-bold mb-3 d-flex align-items-center text-primary">
+        <i data-lucide="git-pull-request" class="me-2"></i>{% trans 'Taken Courses' %}
+    </h5>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle m-0">
             <thead>
                 <tr>
                     <th>#</th>
-                    <th> {% trans 'Course Name' %} </th>
-                    <th> {% trans 'Course Code' %} </th>
-                    <th> {% trans 'Cr.Hr' %} </th>
-                    <th> {% trans 'Year' %} </th>
-                    <th> {% trans 'Semester' %} </th>
-                    <th> {% trans 'Current Semester' %} </th>
-                    <th> {% trans 'Taken' %} </th>
+                    <th>{% trans 'Course Name' %}</th>
+                    <th>{% trans 'Course Code' %}</th>
+                    <th>{% trans 'Cr.Hr' %}</th>
+                    <th>{% trans 'Year' %}</th>
+                    <th>{% trans 'Semester' %}</th>
+                    <th>{% trans 'Current Semester' %}</th>
+                    <th>{% trans 'Status' %}</th>
                 </tr>
             </thead>
             <tbody>
                 {% for course in taken_courses %}
                 <tr>
                     <td>{{ forloop.counter }}.</td> 
-                    <td><a href="{{ course.get_absolute_url }}">
-                        {{ course.course.title }}</a></td>
-                    <td>{{ course.course.code }}</td>
+                    <td><a href="{{ course.get_absolute_url }}" class="fw-semibold text-decoration-none">{{ course.course.title }}</a></td>
+                    <td class="font-monospace small">{{ course.course.code }}</td>
                     <td>{{ course.course.credit }}</td>
                     <td>{{ course.course.year }}</td>
                     <td>{{ course.course.semester }}</td>
-                    <th>
+                    <td>
                         {% if course.course.is_current_semester == False %}
-                        <i class="fas fa-times-circle fa-1-5x danger"></i>
+                        <span class="text-danger"><i data-lucide="x-circle"></i></span>
                         {% else %}
-                        <i class="fas fa-check-circle"></i>
+                        <span class="text-success"><i data-lucide="check-circle"></i></span>
                         {% endif %}
-                    </th>
-                    <td class="success">
-                        <i class="fas fa-check-circle"></i> {% trans 'Taken' %}
                     </td>
+                    <td>
+                        <span class="badge bg-light-aqua text-success"><i data-lucide="check-circle" class="me-1"></i>{% trans 'Taken' %}</span>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" class="text-center py-3 text-muted">{% trans 'No taken courses.' %}</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -70,38 +77,43 @@
 </div>
 {% endif %}
 
-<div class="table-responsive p-3">
-    <h6 class="fw-bold text-primary"><u>{% trans 'All Courses:' %}</u></h6>
-    <div class="table-shadow">
-        <table class="table table-light">
+<div class="card p-3 mb-4">
+    <h5 class="fw-bold mb-3 d-flex align-items-center text-primary">
+        <i data-lucide="book" class="me-2"></i>{% trans 'All Courses' %}
+    </h5>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle m-0">
             <thead>
                 <tr>
                     <th>#</th>
-                    <th> {% trans 'Course Name' %} </th>
-                    <th> {% trans 'Course Code' %} </th>
-                    <th> {% trans 'Cr.Hr' %} </th>
-                    <th> {% trans 'Year' %} </th>
-                    <th> {% trans 'Semester' %} </th>
-                    <th> {% trans 'Current Semester' %} </th>
+                    <th>{% trans 'Course Name' %}</th>
+                    <th>{% trans 'Course Code' %}</th>
+                    <th>{% trans 'Cr.Hr' %}</th>
+                    <th>{% trans 'Year' %}</th>
+                    <th>{% trans 'Semester' %}</th>
+                    <th>{% trans 'Current Semester' %}</th>
                 </tr>
             </thead>
             <tbody>
                 {% for course in courses %}
                 <tr>
                     <td>{{ forloop.counter }}.</td> 
-                    <td><a href="{{ course.get_absolute_url }}">
-                        {{ course.title }}</a></td>
-                    <td>{{ course.code }}</td>
+                    <td><a href="{{ course.get_absolute_url }}" class="fw-semibold text-decoration-none">{{ course.title }}</a></td>
+                    <td class="font-monospace small">{{ course.code }}</td>
                     <td>{{ course.credit }}</td>
                     <td>{{ course.year }}</td>
                     <td>{{ course.semester }}</td>
-                    <th>
+                    <td>
                         {% if course.is_current_semester == False %}
-                        <i class="fas fa-times-circle fa-1-5x danger"></i>
+                        <span class="text-danger"><i data-lucide="x-circle"></i></span>
                         {% else %}
-                        <i class="fas fa-check-circle"></i>
+                        <span class="text-success"><i data-lucide="check-circle"></i></span>
                         {% endif %}
-                    </th>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center py-3 text-muted">{% trans 'No courses found.' %}</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -110,18 +122,24 @@
 </div>
 
 {% if courses.paginator.page_range|length > 1 %}
-<div class="content-center">
-    <div class="pagination">
-        <a href="?page=1">&laquo;</a>
-        {% for i in courses.paginator.page_range %}
-            {% if i == courses.number %}
-                <a class="pagination-active" href="?page={{ i }}"><b>{{ i }}</b></a>
-            {% else %}
-                <a href="?page={{ i }}">{{ i }}</a>
-            {% endif %}
-        {% endfor %}
-        <a href="?page={{ courses.paginator.num_pages }}">&raquo;</a>
-    </div>
+<div class="d-flex justify-content-center mt-3">
+    <nav aria-label="Page navigation">
+        <ul class="pagination pagination-sm">
+            <li class="page-item">
+                <a class="page-link" href="?page=1" aria-label="First">&laquo;</a>
+            </li>
+            {% for i in courses.paginator.page_range %}
+                {% if i == courses.number %}
+                    <li class="page-item active"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                {% else %}
+                    <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                {% endif %}
+            {% endfor %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ courses.paginator.num_pages }}" aria-label="Last">&raquo;</a>
+            </li>
+        </ul>
+    </nav>
 </div>
 {% endif %}
 

@@ -13,61 +13,143 @@
     </ol>
 </nav>  
 
-<div class="title-1"><i class="fas fa-user-tie"></i>{% trans 'Admin Panel' %}</div>
-<br>
-<br>
+<h2 class="mb-4"><i data-lucide="shield-check" class="me-2 text-primary"></i>{% trans 'Admin Control Panel' %}</h2>
 
 {% include 'snippets/messages.html' %}
 
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-md-6">
-            <div class="border-bottom">
-                {% trans 'Manage' %}<a class="link" href="{% url 'lecturer_list' %}"> {% trans 'Lecturers' %} &raquo;</a>
-                <p class="text-muted">CRUD (Create, Retrieve, Update &amp; Delete) lecturers</p>
-            </div>
-
-            <div class="border-bottom mt-3">
-                {% trans 'Manage' %}<a class="link" href="{% url 'student_list' %}"> {% trans 'Students' %} &raquo;</a>
-            <p class="text-muted">CRUD (Create, Retrieve, Update &amp; Delete) {% trans 'students' %}</p>
-            </div>
-
-            <div class="border-bottom mt-3">
-                {% trans 'Manage' %}<a class="link" href="{% url 'session_list' %}"> {% trans 'Session' %} &raquo;</a>
-            <p class="text-muted">CRUD (Create, Retrieve, Update &amp; Delete) {% trans 'sessions' %}</p>
-            </div>
-
-            <div class="mt-3">
-                {% trans 'Manage' %}<a class="link" href="{% url 'semester_list' %}"> {% trans 'Semester' %} &raquo;</a>
-            <p class="text-muted">CRUD (Create, Retrieve, Update &amp; Delete) {% trans 'semesters' %}</p>
+<div class="row g-4">
+    <!-- Configuration & System Settings -->
+    <div class="col-lg-4">
+        <div class="card p-3 mb-4">
+            <h5 class="fw-bold mb-3 d-flex align-items-center">
+                <i data-lucide="settings" class="me-2 text-primary"></i>{% trans 'System Settings' %}
+            </h5>
+            
+            <div class="p-3 bg-light rounded border border-light d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="fw-semibold d-block">{% trans 'Course Add & Drop' %}</span>
+                    <span class="text-muted small">{% trans 'Control registration' %}</span>
+                </div>
+                <div class="form-check form-switch fs-4">
+                    <input class="form-check-input" type="checkbox" role="switch" id="courseAddDropSwitch" checked>
+                </div>
             </div>
         </div>
-        <div class="col-md-6">
-            <div class="border-bottom">
-                {% trans 'Course Add' %} &amp; {% trans 'Drop' %}
-                <label class="switch switch-text switch-success switch-pill" style="float: right;">
-                <input type="checkbox" class="switch-input" checked="true">
-                <span data-on="On" data-off="Off" class="switch-label"></span>
-                <span class="switch-handle"></span>
-                </label>
-                <p class="text-muted">{% trans 'Switch' %} 
-                    <i class="info-text py-0 px-2 bg-success text-light">ON</i> or <i class="info-text py-0 px-2 bg-danger text-light">OFF</i>
-                </p>
+    </div>
+
+    <!-- Management Modules -->
+    <div class="col-lg-8">
+        <div class="row g-3">
+            <!-- Lecturers Card -->
+            <div class="col-md-6">
+                <div class="card p-3 h-100 d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="d-flex align-items-center mb-2">
+                            <i data-lucide="graduation-cap" class="text-primary me-2"></i>
+                            <h5 class="fw-bold m-0">{% trans 'Lecturers' %}</h5>
+                        </div>
+                        <p class="text-muted small">{% trans 'Manage lecturer registry, assign roles, and handle profiles.' %}</p>
+                    </div>
+                    <a class="btn btn-light btn-sm text-primary w-100 text-center mt-3" href="{% url 'lecturer_list' %}">
+                        {% trans 'Manage Lecturers' %} &raquo;
+                    </a>
+                </div>
             </div>
 
-            <div class="border-bottom mt-3">
-                {% trans 'Manage' %}<a class="link" href="{% url 'programs' %}"> {% trans 'Programs' %} &amp; {% trans 'Courses' %} &raquo;</a>
-            <p class="text-muted">CRUD (Create, Retrieve, Update &amp; Delete) {% trans 'programs' %}</p>
+            <!-- Students Card -->
+            <div class="col-md-6">
+                <div class="card p-3 h-100 d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="d-flex align-items-center mb-2">
+                            <i data-lucide="users" class="text-success me-2"></i>
+                            <h5 class="fw-bold m-0">{% trans 'Students' %}</h5>
+                        </div>
+                        <p class="text-muted small">{% trans 'Manage student admissions, profiles, and level details.' %}</p>
+                    </div>
+                    <a class="btn btn-light btn-sm text-success w-100 text-center mt-3" href="{% url 'student_list' %}">
+                        {% trans 'Manage Students' %} &raquo;
+                    </a>
+                </div>
             </div>
 
-            <div class="border-bottom mt-3">
-                {% trans 'Manage' %}<a class="link" href="{% url 'course_allocation_view' %}"> {% trans 'Course Allocations' %} &raquo;</a>
-            <p class="text-muted">CRUD (Create, Retrieve, Update &amp; Delete) {% trans 'course allocations' %}</p>
+            <!-- Programs & Courses Card -->
+            <div class="col-md-6">
+                <div class="card p-3 h-100 d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="d-flex align-items-center mb-2">
+                            <i data-lucide="book-open" class="text-info me-2"></i>
+                            <h5 class="fw-bold m-0">{% trans 'Programs & Courses' %}</h5>
+                        </div>
+                        <p class="text-muted small">{% trans 'Add and edit degrees, courses, descriptions, and curricula.' %}</p>
+                    </div>
+                    <a class="btn btn-light btn-sm text-info w-100 text-center mt-3" href="{% url 'programs' %}">
+                        {% trans 'Manage Courses' %} &raquo;
+                    </a>
+                </div>
             </div>
 
-            <div class="mt-3">
-                {% trans 'Manage' %}<a class="link" href="{% url 'home' %}"> {% trans 'News' %} &amp; {% trans 'Events' %} &raquo;</a>
-            <p class="text-muted">CRUD (Create, Retrieve, Update &amp; Delete) {% trans 'News' %} &amp; {% trans 'Events' %}</p>
+            <!-- Course Allocations Card -->
+            <div class="col-md-6">
+                <div class="card p-3 h-100 d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="d-flex align-items-center mb-2">
+                            <i data-lucide="git-pull-request" class="text-warning me-2"></i>
+                            <h5 class="fw-bold m-0">{% trans 'Course Allocations' %}</h5>
+                        </div>
+                        <p class="text-muted small">{% trans 'Assign allocated course units to respective lecturers.' %}</p>
+                    </div>
+                    <a class="btn btn-light btn-sm text-warning w-100 text-center mt-3" href="{% url 'course_allocation_view' %}">
+                        {% trans 'Allocate Courses' %} &raquo;
+                    </a>
+                </div>
+            </div>
+
+            <!-- Sessions Card -->
+            <div class="col-md-6">
+                <div class="card p-3 h-100 d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="d-flex align-items-center mb-2">
+                            <i data-lucide="history" class="text-purple me-2"></i>
+                            <h5 class="fw-bold m-0">{% trans 'Academic Sessions' %}</h5>
+                        </div>
+                        <p class="text-muted small">{% trans 'Set up active study sessions and general system cycles.' %}</p>
+                    </div>
+                    <a class="btn btn-light btn-sm text-purple w-100 text-center mt-3" href="{% url 'session_list' %}">
+                        {% trans 'Manage Sessions' %} &raquo;
+                    </a>
+                </div>
+            </div>
+
+            <!-- Semesters Card -->
+            <div class="col-md-6">
+                <div class="card p-3 h-100 d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="d-flex align-items-center mb-2">
+                            <i data-lucide="calendar" class="text-danger me-2"></i>
+                            <h5 class="fw-bold m-0">{% trans 'Semesters' %}</h5>
+                        </div>
+                        <p class="text-muted small">{% trans 'Manage academic semesters, exams, and date durations.' %}</p>
+                    </div>
+                    <a class="btn btn-light btn-sm text-danger w-100 text-center mt-3" href="{% url 'semester_list' %}">
+                        {% trans 'Manage Semesters' %} &raquo;
+                    </a>
+                </div>
+            </div>
+
+            <!-- News & Events Card -->
+            <div class="col-12">
+                <div class="card p-3 d-flex flex-row justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                        <i data-lucide="newspaper" class="text-info me-3" style="width: 32px; height: 32px;"></i>
+                        <div>
+                            <h5 class="fw-bold m-0">{% trans 'News & Events' %}</h5>
+                            <p class="text-muted small m-0">{% trans 'Publish and update school events, news posts, and general notices.' %}</p>
+                        </div>
+                    </div>
+                    <a class="btn btn-light btn-sm text-info text-nowrap px-3 ms-3" href="{% url 'home' %}">
+                        {% trans 'Manage News' %} &raquo;
+                    </a>
+                </div>
             </div>
         </div>
     </div>
