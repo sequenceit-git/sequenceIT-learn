@@ -29,12 +29,27 @@ SECRET_KEY = config(
 DEBUG = config("DEBUG", default=True, cast=bool)
 
 # Parse ALLOWED_HOSTS from environment (comma-separated), with sensible defaults
-_allowed_hosts_env = config("ALLOWED_HOSTS", default="127.0.0.1,localhost")
+_allowed_hosts_env = config("ALLOWED_HOSTS", default="*")
 ALLOWED_HOSTS = [h.strip() for h in _allowed_hosts_env.split(",") if h.strip()]
+if "*" not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.extend(["127.0.0.1", "localhost"])
 
 # Reverse proxy settings (Traefik / Nginx)
 USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+# CSRF Trusted Origins (required in Django 4.0+ for HTTPS reverse proxies)
+_csrf_origins_env = config("CSRF_TRUSTED_ORIGINS", default="")
+if _csrf_origins_env:
+    CSRF_TRUSTED_ORIGINS = [o.strip() for o in _csrf_origins_env.split(",") if o.strip()]
+else:
+    CSRF_TRUSTED_ORIGINS = [
+        f"https://{h}" for h in ALLOWED_HOSTS if h not in ("*", "127.0.0.1", "localhost")
+    ]
+    CSRF_TRUSTED_ORIGINS.extend([
+        "https://sms-demo.sequenceit.software",
+        "http://sms-demo.sequenceit.software",
+    ])
 
 # change the default user models to our custom model
 AUTH_USER_MODEL = "accounts.User"
@@ -236,16 +251,12 @@ STRIPE_PUBLISHABLE_KEY = config("STRIPE_PUBLISHABLE_KEY", default="")
 
 # LOGGING
 # ------------------------------------------------------------------------------
-# https://docs.djangoproject.com/en/dev/ref/settings/#logging
-# See https://docs.djangoproject.com/en/dev/topics/logging for
-# more details on how to customize your logging configuration.
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
     "formatters": {
         "verbose": {
-            "format": "%(levelname)s %(asctime)s %(module)s "
-            "%(process)d %(thread)d %(message)s"
+            "format": "%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s"
         }
     },
     "handlers": {
@@ -254,6 +265,18 @@ LOGGING = {
             "class": "logging.StreamHandler",
             "formatter": "verbose",
         }
+    },
+    "loggers": {
+        "django.request": {
+            "handlers": ["console"],
+            "level": "DEBUG",
+            "propagate": False,
+        },
+        "django.security": {
+            "handlers": ["console"],
+            "level": "DEBUG",
+            "propagate": False,
+        },
     },
     "root": {"level": "INFO", "handlers": ["console"]},
 }
