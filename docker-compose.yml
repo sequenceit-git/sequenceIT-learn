@@ -62,13 +62,13 @@ services:
       - "traefik.enable=true"
 
       # ---- HTTPS Router (primary) ----
-      - "traefik.http.routers.sequenceit.rule=Host(`sms-demo.sequenceit.com`)"
+      - "traefik.http.routers.sequenceit.rule=Host(`sms-demo.sequenceit.software`)"
       - "traefik.http.routers.sequenceit.entrypoints=websecure"
       - "traefik.http.routers.sequenceit.tls=true"
       - "traefik.http.routers.sequenceit.tls.certresolver=letsencrypt"
 
       # ---- HTTP Router (redirect HTTP → HTTPS) ----
-      - "traefik.http.routers.sequenceit-http.rule=Host(`sms-demo.sequenceit.com`)"
+      - "traefik.http.routers.sequenceit-http.rule=Host(`sms-demo.sequenceit.software`)"
       - "traefik.http.routers.sequenceit-http.entrypoints=web"
       - "traefik.http.routers.sequenceit-http.middlewares=redirect-to-https"
 

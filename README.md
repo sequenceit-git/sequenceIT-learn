@@ -73,7 +73,7 @@ SequenceIT Learn is production-ready with a full Docker + CI/CD setup.
 | Reverse proxy | Traefik (auto TLS via Let's Encrypt) |
 | Container | Docker + Docker Compose |
 | CI/CD | GitHub Actions |
-| Live URL | [sms-demo.sequenceit.com](https://sms-demo.sequenceit.com) |
+| Live URL | [sms-demo.sequenceit.software](https://sms-demo.sequenceit.software) |
 
 ### CI/CD Pipeline
 
