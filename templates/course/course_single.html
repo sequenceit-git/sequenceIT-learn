@@ -180,7 +180,7 @@
             <div class="card p-3 h-100 text-center bg-light border border-light">
                 <div class="card-body p-0">
                     {% if lecturer.lecturer.picture %}
-                    <img class="rounded-circle mb-3 border" src="{{ lecturer.lecturer.picture.url }}" alt="{{ lecturer }}" style="width: 80px; height: 80px; object-fit: cover;">
+                    <img class="rounded-circle mb-3 border" src="{{ lecturer.lecturer.get_picture }}" alt="{{ lecturer }}" style="width: 80px; height: 80px; object-fit: cover;">
                     {% else %}
                     <div class="rounded-circle mb-3 border bg-secondary text-white d-flex align-items-center justify-content-center mx-auto" style="width: 80px; height: 80px; font-size: 2rem;">
                         {{ lecturer.first_name|slice:":1" }}{{ lecturer.last_name|slice:":1" }}

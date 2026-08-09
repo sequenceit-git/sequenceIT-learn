@@ -16,12 +16,12 @@
 
 		<div class="dropdown">
 			<div class="avatar border border-2" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-				<img src="{{ request.user.picture.url }}">
+				<img src="{{ request.user.get_picture }}">
 			</div>
 			<div class="dropdown-menu dropdown-menu-end" style="min-width: 14rem !important;">
 				<div class="d-flex flex-column align-items-center py-2">
 					<div class="profile-avatar-container mb-2" style="width: 70px; height: 70px;">
-						<img src="{{ request.user.picture.url }}" class="profile-avatar">
+						<img src="{{ request.user.get_picture }}" class="profile-avatar">
 					</div>
 					<h6 class="fw-bold mb-1">{{ request.user.get_full_name|title }}</h6>
 					<p class="small text-muted text-center mb-0">

@@ -100,22 +100,22 @@ class User(AbstractUser):
     @property
     def get_user_role(self):
         if self.is_superuser:
-            role = _("Admin")
+            return _("Admin")
         elif self.is_student:
-            role = _("Student")
+            return _("Student")
         elif self.is_lecturer:
-            role = _("Lecturer")
+            return _("Lecturer")
         elif self.is_parent:
-            role = _("Parent")
-
-        return role
+            return _("Parent")
+        return _("User")
 
     def get_picture(self):
         try:
-            return self.picture.url
-        except:
-            no_picture = settings.MEDIA_URL + "default.png"
-            return no_picture
+            if self.picture and hasattr(self.picture, "url"):
+                return self.picture.url
+        except Exception:
+            pass
+        return settings.MEDIA_URL + "default.png"
 
     def get_absolute_url(self):
         return reverse("profile_single", kwargs={"user_id": self.id})
